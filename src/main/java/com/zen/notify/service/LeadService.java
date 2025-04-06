@@ -1,0 +1,71 @@
+package com.zen.notify.service;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+
+import com.zen.notify.entity.Lead;
+import com.zen.notify.entity.User;
+import com.zen.notify.repository.LeadRepository;
+import com.zen.notify.repository.UserRepository;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import java.util.List;
+
+import java.util.Optional;
+
+@Service
+@RequiredArgsConstructor
+public class LeadService {
+	
+
+        @Autowired
+	    private LeadRepository leadRepository;
+
+	    public List<Lead> getAllLeads() {
+	        return leadRepository.findAll();
+	    }
+
+	    public Lead getLeadById(Long id) {
+	        return leadRepository.findById(id).orElse(null);
+	    }
+
+	    public Lead createLead(Lead lead) {
+	    	 Optional<Lead> existingContact = Optional.ofNullable(leadRepository.findByEmail(lead.getEmail()));
+
+	         if (existingContact.isPresent()) {
+	             throw new RuntimeException("Duplicate Lead: A contact with this email already exists.");
+	         }
+	        return leadRepository.save(lead);
+	    }
+
+	    public Lead updateLead(Long id, Lead leadDetails) {
+	        return leadRepository.findById(id).map(lead -> {
+	            lead.setLeadOwner(leadDetails.getLeadOwner());
+	            lead.setCompany(leadDetails.getCompany());
+	            lead.setFirstName(leadDetails.getFirstName());
+	            lead.setLastName(leadDetails.getLastName());
+	            lead.setTitle(leadDetails.getTitle());
+	            lead.setEmail(leadDetails.getEmail());
+	            lead.setFax(leadDetails.getFax());
+	            lead.setMobile(leadDetails.getMobile());
+	            lead.setWebsite(leadDetails.getWebsite());
+	            lead.setLeadSource(leadDetails.getLeadSource());
+	            lead.setLeadStatus(leadDetails.getLeadStatus());
+	            lead.setIndustry(leadDetails.getIndustry());
+	            lead.setNoOfEmployees(leadDetails.getNoOfEmployees());
+	            lead.setAnnualRevenue(leadDetails.getAnnualRevenue());
+	            lead.setRating(leadDetails.getRating());
+	            lead.setEmailOptOut(leadDetails.getEmailOptOut());
+	            lead.setSkypeId(leadDetails.getSkypeId());
+	            lead.setSecondaryEmail(leadDetails.getSecondaryEmail());
+	            lead.setTwitter(leadDetails.getTwitter());
+	            lead.setDescription(leadDetails.getDescription());
+	            return leadRepository.save(lead);
+	        }).orElse(null);
+	    }
+
+	    public void deleteLead(Long id) {
+	        leadRepository.deleteById(id);
+	    }
+	}
+
