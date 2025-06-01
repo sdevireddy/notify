@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 @Service
 public class ContactToDealConverter {
 
-    public Deal convertContactToDeal(Contact contact, Double amount, Date closingDate, String stage) {
+    public Deal convertContactToDeal(Contact contact, BigDecimal amount, Date closingDate, String stage) {
         if (contact == null) {
             throw new IllegalArgumentException("Contact cannot be null");
         }

@@ -18,6 +18,7 @@ import com.zen.notify.service.LeadService;
 
 import lombok.RequiredArgsConstructor;
 
+@CrossOrigin(origins = "http://localhost:3000")
 @RestController
 @RequestMapping("/api/leads")
 @RequiredArgsConstructor

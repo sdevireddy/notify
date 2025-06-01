@@ -62,9 +62,9 @@ public class ContactController {
         return ResponseEntity.noContent().build();
     }
     
-    @PostMapping("/{contactId}/convertToDeal")
-    public ResponseEntity<Deal> convertToDeal(@PathVariable Long contactId) {
-        Deal deal = converter.convertContactToDeal(contactId);
-        return ResponseEntity.ok(deal);
-    }
+//    @PostMapping("/{contactId}/convertToDeal")
+//    public ResponseEntity<Deal> convertToDeal(@PathVariable Long contactId) {
+//        Deal deal = converter.convertContactToDeal(contactId);
+//        return ResponseEntity.ok(deal);
+//    }
 }

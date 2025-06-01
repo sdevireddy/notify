@@ -1,12 +1,12 @@
-package com.ipixelzen.marketing.service;
+package com.zen.notify.service;
 
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.ipixelzen.marketing.entity.User;
-import com.ipixelzen.marketing.repository.UserRepository;
+import com.zen.notify.entity.User;
+import com.zen.notify.repository.UserRepository;
 
 @Service
 public class UserService {

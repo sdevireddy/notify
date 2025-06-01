@@ -1,4 +1,4 @@
-package com.ipixelzen.marketing.repository;
+package com.zen.notify.repository;
 
 import java.util.Optional;
 

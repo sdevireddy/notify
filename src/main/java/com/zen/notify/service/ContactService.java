@@ -36,7 +36,7 @@ public class ContactService {
     // Update an existing contact
     @Transactional
     public Contact updateContact(Long contactId, Contact updatedContact) {
-        Contact contact = getContactById(contactId);
+        Contact contact = contactRepository.getById(contactId);
 
         contact.setFirstName(updatedContact.getFirstName());
         contact.setLastName(updatedContact.getLastName());
@@ -51,7 +51,7 @@ public class ContactService {
 
     // Delete a contact
     public void deleteContact(Long contactId) {
-        Contact contact = getContactById(contactId);
+        Contact contact = contactRepository.getById(contactId);
         contactRepository.delete(contact);
     }
 }
