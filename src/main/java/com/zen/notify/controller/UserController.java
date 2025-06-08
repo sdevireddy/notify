@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,8 +13,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.User;
 import com.zen.notify.service.UserService;
 
@@ -51,10 +54,28 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
-    // Get all users
-    @GetMapping("/all")
-    public List<User> getAllUsers() {
-        return userService.getAllUsers();
+	/*
+	 * // Get all users
+	 * 
+	 * @GetMapping public List<User> getAllUsers() { return
+	 * userService.getAllUsers(); }
+	 */
+    
+    @GetMapping
+    public ResponseEntity<PaginatedResponse<User>> getAllUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
+        Page<User> userPage = userService.getUsersPaginated(page, pageSize);
+
+        PaginatedResponse<User> response = new PaginatedResponse<>(
+                (int) userPage.getTotalElements(),
+                pageSize,
+                userPage.getContent()
+        );
+
+        return ResponseEntity.ok(response);
     }
+
 }
 

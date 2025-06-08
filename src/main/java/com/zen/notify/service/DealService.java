@@ -2,11 +2,18 @@ package com.zen.notify.service;
 
 
 import com.zen.notify.entity.Deal;
+import com.zen.notify.entity.Lead;
 import com.zen.notify.repository.DealRepository;
+import com.zen.notify.search.DealSearchCriteria;
+import com.zen.notify.search.DealSpecification;
+import com.zen.notify.search.LeadSearchCriteria;
+import com.zen.notify.search.LeadSpecification;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -66,5 +73,12 @@ public class DealService {
     public void deleteDeal(Long dealId) {
         dealRepository.deleteById(dealId);
     }
+    
+    public Page<Deal> searchDeals(DealSearchCriteria criteria, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Deal> spec = new DealSpecification(criteria);
+        return dealRepository.findAll(spec, pageable);
+    }
+
 }
 

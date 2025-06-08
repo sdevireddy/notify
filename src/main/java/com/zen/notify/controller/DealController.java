@@ -3,6 +3,7 @@ package com.zen.notify.controller;
 
 import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Deal;
+import com.zen.notify.search.DealSearchCriteria;
 import com.zen.notify.service.DealService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,8 +26,6 @@ public class DealController {
         return ResponseEntity.ok(dealService.createDeal(deal));
     }
     
-    
-
 	/*
 	 * // Get All Deals
 	 * 
@@ -68,5 +67,23 @@ public class DealController {
         dealService.deleteDeal(id);
         return ResponseEntity.ok("Deal deleted successfully");
     }
+    
+    @PostMapping("/search")
+    public ResponseEntity<?> searchDeals(
+            @RequestBody DealSearchCriteria criteria,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<Deal> dealPage = dealService.searchDeals(criteria, page, size);
+
+        PaginatedResponse<Deal> response = new PaginatedResponse<Deal>(
+              dealPage.getTotalPages(),
+              dealPage.getSize(),
+              dealPage.getContent()
+        );
+        
+        return ResponseEntity.ok(response);
+    }
+    
 }
 

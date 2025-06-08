@@ -4,12 +4,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.zen.notify.entity.Lead;
 import com.zen.notify.entity.User;
 import com.zen.notify.repository.LeadRepository;
 import com.zen.notify.repository.UserRepository;
+import com.zen.notify.search.LeadSearchCriteria;
+import com.zen.notify.search.LeadSpecification;
+
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
@@ -75,5 +79,12 @@ public class LeadService {
 	    public void deleteLead(Long id) {
 	        leadRepository.deleteById(id);
 	    }
+	    
+	    public Page<Lead> searchLeads(LeadSearchCriteria criteria, int page, int size) {
+	        Pageable pageable = PageRequest.of(page, size);
+	        Specification<Lead> spec = new LeadSpecification(criteria);
+	        return leadRepository.findAll(spec, pageable);
+	    }
+
 	}
 

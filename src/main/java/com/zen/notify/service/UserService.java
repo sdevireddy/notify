@@ -3,9 +3,12 @@ package com.zen.notify.service;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.zen.notify.entity.User;
+import com.zen.notify.exceptions.UserNotFoundException;
 import com.zen.notify.repository.UserRepository;
 
 @Service
@@ -16,12 +19,12 @@ public class UserService {
 
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(username));
     }
 
     public User getUserByEmail(String email) {
         return userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(email));
     }
 
     public List<User> getAllUsers() {
@@ -30,7 +33,7 @@ public class UserService {
 
     public User getUserById(Long id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     public User createUser(User user) {
@@ -48,4 +51,10 @@ public class UserService {
     public void deleteUser(Long id) {
         userRepository.deleteById(id);
     }
+    
+    public Page<User> getUsersPaginated(int page, int pageSize) {
+        PageRequest pageable = PageRequest.of(page, pageSize);
+        return userRepository.findAll(pageable);
+    }
+
 }

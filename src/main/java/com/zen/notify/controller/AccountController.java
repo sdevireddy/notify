@@ -3,6 +3,9 @@ package com.zen.notify.controller;
 
 import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Account;
+import com.zen.notify.entity.Lead;
+import com.zen.notify.search.AccountSearchCriteria;
+import com.zen.notify.search.LeadSearchCriteria;
 import com.zen.notify.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -69,6 +72,20 @@ public class AccountController {
     public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
         accountService.deleteAccount(id);
         return ResponseEntity.ok("Account deleted successfully");
+    }
+    
+    @PostMapping("/search")
+    public ResponseEntity<?> searchLeads(
+            @RequestBody AccountSearchCriteria criteria,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<Account> accountPage = accountService.searchAccounts(criteria, page, size);
+
+        PaginatedResponse<Account> response = new PaginatedResponse<Account>(accountPage.getTotalPages(), 
+        		accountPage.getSize(), accountPage.getContent());
+
+        return ResponseEntity.ok(response);
     }
 }
 

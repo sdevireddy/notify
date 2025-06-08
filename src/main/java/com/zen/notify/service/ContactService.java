@@ -1,11 +1,17 @@
 package com.zen.notify.service;
 
 import com.zen.notify.entity.Contact;
+import com.zen.notify.entity.Lead;
 import com.zen.notify.repository.ContactRepository;
+import com.zen.notify.search.ContactSearchCriteria;
+import com.zen.notify.search.ContactSpecification;
+import com.zen.notify.search.LeadSearchCriteria;
+import com.zen.notify.search.LeadSpecification;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -64,4 +70,11 @@ public class ContactService {
         Contact contact = contactRepository.getById(contactId);
         contactRepository.delete(contact);
     }
+    public Page<Contact> searchContacts(ContactSearchCriteria criteria, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Contact> spec = new ContactSpecification(criteria);
+        return contactRepository.findAll(spec, pageable);
+    }
+
+    
 }

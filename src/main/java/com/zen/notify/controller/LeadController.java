@@ -15,6 +15,7 @@ import java.util.List;
 import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Lead;
+import com.zen.notify.search.LeadSearchCriteria;
 import com.zen.notify.service.LeadConversionService;
 import com.zen.notify.service.LeadService;
 
@@ -87,7 +88,22 @@ public class LeadController {
 	        return ResponseEntity.ok(convertedContact);
 	    }
 
+	    // Search leads
+	    
+	    @PostMapping("/search")
+	    public ResponseEntity<?> searchLeads(
+	            @RequestBody LeadSearchCriteria criteria,
+	            @RequestParam(defaultValue = "0") int page,
+	            @RequestParam(defaultValue = "10") int size) {
 
+	        Page<Lead> leadPage = leadService.searchLeads(criteria, page, size);
+
+
+	        PaginatedResponse<Lead> response = new PaginatedResponse<Lead>(leadPage.getTotalPages(), 
+	        		leadPage.getSize(), leadPage.getContent());
+
+	        return ResponseEntity.ok(response);
+	    }
     
     
 }

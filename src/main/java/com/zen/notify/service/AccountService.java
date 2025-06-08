@@ -3,13 +3,20 @@ package com.zen.notify.service;
 
 
 import com.zen.notify.entity.Account;
+import com.zen.notify.entity.Lead;
 import com.zen.notify.repository.AccountRepository;
+import com.zen.notify.search.AccountSearchCriteria;
+import com.zen.notify.search.AccountSpecification;
+import com.zen.notify.search.LeadSearchCriteria;
+import com.zen.notify.search.LeadSpecification;
+
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Date;
 import java.util.List;
@@ -70,4 +77,11 @@ public class AccountService {
     public void deleteAccount(Long accountId) {
         accountRepository.deleteById(accountId);
     }
+    
+    public Page<Account> searchAccounts(AccountSearchCriteria criteria, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Specification<Account> spec = new AccountSpecification(criteria);
+        return accountRepository.findAll(spec, pageable);
+    }
+
 }

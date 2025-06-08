@@ -10,6 +10,8 @@ import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Account;
 import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Deal;
+import com.zen.notify.entity.Lead;
+import com.zen.notify.search.ContactSearchCriteria;
 import com.zen.notify.service.ContactService;
 import com.zen.notify.service.ContactToDealConverter;
 
@@ -79,6 +81,21 @@ public class ContactController {
         return ResponseEntity.noContent().build();
     }
     
+    @PostMapping("/search")
+    public ResponseEntity<?> searchContacts(
+            @RequestBody ContactSearchCriteria criteria,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+
+        Page<Contact> contactPage = contactService.searchContacts(criteria, page, size);
+
+
+
+        PaginatedResponse<Contact> response = new PaginatedResponse<Contact>(contactPage.getTotalPages(), 
+        		contactPage.getSize(), contactPage.getContent());
+        return ResponseEntity.ok(response);
+
+    }
 //    @PostMapping("/{contactId}/convertToDeal")
 //    public ResponseEntity<Deal> convertToDeal(@PathVariable Long contactId) {
 //        Deal deal = converter.convertContactToDeal(contactId);
