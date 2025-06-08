@@ -2,10 +2,11 @@ package com.zen.notify.controller;
 
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-
+import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Account;
 import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Deal;
@@ -26,9 +27,25 @@ public class ContactController {
     @Autowired
     private ContactToDealConverter converter;
 
+	/*
+	 * @GetMapping public List<Contact> getAllContacts() { return
+	 * contactService.getAllContacts(); }
+	 */
+    
     @GetMapping
-    public List<Contact> getAllContacts() {
-        return contactService.getAllContacts();
+    public ResponseEntity<PaginatedResponse<Contact>> getAllContacts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
+        Page<Contact> contactPage = contactService.getContactsPaginated(page, pageSize);
+
+        PaginatedResponse<Contact> response = new PaginatedResponse<>(
+                (int) contactPage.getTotalElements(),
+                pageSize,
+                contactPage.getContent()
+        );
+
+        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/{id}")

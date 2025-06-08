@@ -2,6 +2,10 @@ package com.zen.notify.service;
 
 import com.zen.notify.entity.Contact;
 import com.zen.notify.repository.ContactRepository;
+
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +25,12 @@ public class ContactService {
     public Contact createContact(Contact contact) {
         return contactRepository.save(contact);
     }
+    
+    public Page<Contact> getContactsPaginated(int page, int pageSize) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        return contactRepository.findAll(pageable);
+    }
+
 
     // Retrieve all contacts
     public List<Contact> getAllContacts() {

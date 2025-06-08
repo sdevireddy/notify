@@ -1,6 +1,9 @@
 package com.zen.notify.service;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import com.zen.notify.entity.Lead;
@@ -25,6 +28,11 @@ public class LeadService {
 	        return leadRepository.findAll();
 	    }
 
+	    public Page<Lead> getLeadsPaginated(int page, int pageSize) {
+	        Pageable pageable = PageRequest.of(page, pageSize);
+	        return leadRepository.findAll(pageable);
+	    }
+	    
 	    public Lead getLeadById(Long id) {
 	        return leadRepository.findById(id).orElse(null);
 	    }

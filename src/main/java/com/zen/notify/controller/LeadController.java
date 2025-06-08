@@ -7,10 +7,12 @@ import lombok.RequiredArgsConstructor;
 
 import org.apache.http.HttpStatus;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
+import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Lead;
 import com.zen.notify.service.LeadConversionService;
@@ -30,11 +32,27 @@ public class LeadController {
 	    @Autowired
 	    private LeadConversionService leadConversionService;
 
+		/*
+		 * @GetMapping public List<Lead> getAllLeads() { return
+		 * leadService.getAllLeads(); }
+		 */
+	    
 	    @GetMapping
-	    public List<Lead> getAllLeads() {
-	        return leadService.getAllLeads();
-	    }
+	    public ResponseEntity<PaginatedResponse<Lead>> getAllLeads(
+	            @RequestParam(defaultValue = "0") int page,
+	            @RequestParam(defaultValue = "10") int pageSize) {
 
+	        Page<Lead> leadsPage = leadService.getLeadsPaginated(page, pageSize);
+
+	        PaginatedResponse<Lead> response = new PaginatedResponse<>(
+	                (int) leadsPage.getTotalElements(),
+	                pageSize,
+	                leadsPage.getContent()
+	        );
+
+	        return ResponseEntity.ok(response);
+	    }
+	    
 	    @GetMapping("/{id}")
 	    public ResponseEntity<Lead> getLeadById(@PathVariable Long id) {
 	        Lead lead = leadService.getLeadById(id);

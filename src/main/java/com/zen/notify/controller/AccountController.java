@@ -1,9 +1,11 @@
 package com.zen.notify.controller;
 
 
+import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Account;
 import com.zen.notify.service.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,17 +25,38 @@ public class AccountController {
         return ResponseEntity.ok(accountService.createAccount(account));
     }
 
-    // Get All Accounts
-    @GetMapping
-    public ResponseEntity<List<Account>> getAllAccounts() {
-        return ResponseEntity.ok(accountService.getAllAccounts());
-    }
+	/*
+	 * // Get All Accounts
+	 * 
+	 * @GetMapping public ResponseEntity<PaginatedResponse<Account>>
+	 * getAllAccounts() { List<Account> accounts = accountService.getAllAccounts();
+	 * PaginatedResponse<Account> response = new
+	 * PaginatedResponse<>(accounts.size(), 20, accounts); return
+	 * ResponseEntity.ok(response);
+	 * 
+	 * }
+	 */
 
     // Get Account by ID
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Account>> getAccountById(@PathVariable Long id) {
         return ResponseEntity.ok(accountService.getAccountById(id));
     }
+    
+    @GetMapping
+    public ResponseEntity<PaginatedResponse<Account>> getAllAccounts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int pageSize) {
+
+        Page<Account> accountPage = accountService.getAccountsPaginated(page, pageSize);
+        PaginatedResponse<Account> response = new PaginatedResponse<>(
+                (int) accountPage.getTotalElements(),
+                accountPage.getSize(),
+                accountPage.getContent()
+        );
+        return ResponseEntity.ok(response);
+    }
+
 
     // Update Account
     @PutMapping("/{id}")

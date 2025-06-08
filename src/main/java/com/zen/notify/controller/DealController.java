@@ -1,9 +1,11 @@
 package com.zen.notify.controller;
 
 
+import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Deal;
 import com.zen.notify.service.DealService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -22,13 +24,32 @@ public class DealController {
     public ResponseEntity<Deal> createDeal(@RequestBody Deal deal) {
         return ResponseEntity.ok(dealService.createDeal(deal));
     }
+    
+    
 
-    // Get All Deals
+	/*
+	 * // Get All Deals
+	 * 
+	 * @GetMapping public ResponseEntity<List<Deal>> getAllDeals() { return
+	 * ResponseEntity.ok(dealService.getAllDeals()); }
+	 */
+    
     @GetMapping
-    public ResponseEntity<List<Deal>> getAllDeals() {
-        return ResponseEntity.ok(dealService.getAllDeals());
-    }
+    public ResponseEntity<PaginatedResponse<Deal>> getAllDeals(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize) {
 
+        Page<Deal> dealPage = dealService.getDealsPaginated(page, pageSize);
+
+        PaginatedResponse<Deal> response = new PaginatedResponse<>(
+                (int) dealPage.getTotalElements(),
+                pageSize,
+                dealPage.getContent()
+        );
+
+        return ResponseEntity.ok(response);
+    }
+    
     // Get Deal by ID
     @GetMapping("/{id}")
     public ResponseEntity<Optional<Deal>> getDealById(@PathVariable Long id) {
