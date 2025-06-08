@@ -14,6 +14,7 @@ import java.util.List;
 
 import com.zen.dto.PaginatedResponse;
 import com.zen.notify.entity.Contact;
+import com.zen.notify.entity.Deal;
 import com.zen.notify.entity.Lead;
 import com.zen.notify.search.LeadSearchCriteria;
 import com.zen.notify.service.LeadConversionService;
@@ -45,11 +46,15 @@ public class LeadController {
 
 	        Page<Lead> leadsPage = leadService.getLeadsPaginated(page, pageSize);
 
+
 	        PaginatedResponse<Lead> response = new PaginatedResponse<>(
-	                (int) leadsPage.getTotalElements(),
-	                pageSize,
-	                leadsPage.getContent()
+	        		leadsPage.getTotalElements(),
+	        		leadsPage.getSize(),
+	        		leadsPage.getNumber(),
+	        		leadsPage.getTotalPages(),
+	        		leadsPage.getContent()
 	        );
+
 
 	        return ResponseEntity.ok(response);
 	    }
@@ -98,10 +103,13 @@ public class LeadController {
 
 	        Page<Lead> leadPage = leadService.searchLeads(criteria, page, size);
 
-
-	        PaginatedResponse<Lead> response = new PaginatedResponse<Lead>(leadPage.getTotalPages(), 
-	        		leadPage.getSize(), leadPage.getContent());
-
+	        PaginatedResponse<Lead> response = new PaginatedResponse<>(
+	        		leadPage.getTotalElements(),
+	        		leadPage.getSize(),
+	        		leadPage.getNumber(),
+	        		leadPage.getTotalPages(),
+	        		leadPage.getContent()
+	        );
 	        return ResponseEntity.ok(response);
 	    }
     

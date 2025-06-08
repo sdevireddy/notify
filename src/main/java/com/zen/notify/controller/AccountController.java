@@ -53,10 +53,13 @@ public class AccountController {
 
         Page<Account> accountPage = accountService.getAccountsPaginated(page, pageSize);
         PaginatedResponse<Account> response = new PaginatedResponse<>(
-                (int) accountPage.getTotalElements(),
-                accountPage.getSize(),
-                accountPage.getContent()
+        		accountPage.getTotalElements(),
+        		accountPage.getSize(),
+        		accountPage.getNumber(),
+        		accountPage.getTotalPages(),
+        		accountPage.getContent()
         );
+
         return ResponseEntity.ok(response);
     }
 
@@ -82,8 +85,13 @@ public class AccountController {
 
         Page<Account> accountPage = accountService.searchAccounts(criteria, page, size);
 
-        PaginatedResponse<Account> response = new PaginatedResponse<Account>(accountPage.getTotalPages(), 
-        		accountPage.getSize(), accountPage.getContent());
+        PaginatedResponse<Account> response = new PaginatedResponse<>(
+        		accountPage.getTotalElements(),
+        		accountPage.getSize(),
+        		accountPage.getNumber(),
+        		accountPage.getTotalPages(),
+        		accountPage.getContent()
+        );
 
         return ResponseEntity.ok(response);
     }

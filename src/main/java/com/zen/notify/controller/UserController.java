@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zen.dto.PaginatedResponse;
+import com.zen.notify.entity.Lead;
 import com.zen.notify.entity.User;
 import com.zen.notify.service.UserService;
 
@@ -69,10 +70,13 @@ public class UserController {
         Page<User> userPage = userService.getUsersPaginated(page, pageSize);
 
         PaginatedResponse<User> response = new PaginatedResponse<>(
-                (int) userPage.getTotalElements(),
-                pageSize,
-                userPage.getContent()
+        		userPage.getTotalElements(),
+        		userPage.getSize(),
+        		userPage.getNumber(),
+        		userPage.getTotalPages(),
+        		userPage.getContent()
         );
+
 
         return ResponseEntity.ok(response);
     }

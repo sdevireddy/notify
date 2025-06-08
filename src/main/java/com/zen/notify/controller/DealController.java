@@ -2,6 +2,7 @@ package com.zen.notify.controller;
 
 
 import com.zen.dto.PaginatedResponse;
+import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Deal;
 import com.zen.notify.search.DealSearchCriteria;
 import com.zen.notify.service.DealService;
@@ -41,9 +42,11 @@ public class DealController {
         Page<Deal> dealPage = dealService.getDealsPaginated(page, pageSize);
 
         PaginatedResponse<Deal> response = new PaginatedResponse<>(
-                (int) dealPage.getTotalElements(),
-                pageSize,
-                dealPage.getContent()
+        		dealPage.getTotalElements(),
+        		dealPage.getSize(),
+        		dealPage.getNumber(),
+        		dealPage.getTotalPages(),
+        		dealPage.getContent()
         );
 
         return ResponseEntity.ok(response);
@@ -75,13 +78,13 @@ public class DealController {
             @RequestParam(defaultValue = "10") int size) {
 
         Page<Deal> dealPage = dealService.searchDeals(criteria, page, size);
-
-        PaginatedResponse<Deal> response = new PaginatedResponse<Deal>(
-              dealPage.getTotalPages(),
-              dealPage.getSize(),
-              dealPage.getContent()
+        PaginatedResponse<Deal> response = new PaginatedResponse<>(
+        		dealPage.getTotalElements(),
+        		dealPage.getSize(),
+        		dealPage.getNumber(),
+        		dealPage.getTotalPages(),
+        		dealPage.getContent()
         );
-        
         return ResponseEntity.ok(response);
     }
     

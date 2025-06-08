@@ -42,9 +42,11 @@ public class ContactController {
         Page<Contact> contactPage = contactService.getContactsPaginated(page, pageSize);
 
         PaginatedResponse<Contact> response = new PaginatedResponse<>(
-                (int) contactPage.getTotalElements(),
-                pageSize,
-                contactPage.getContent()
+        		contactPage.getTotalElements(),
+        		contactPage.getSize(),
+        		contactPage.getNumber(),
+        		contactPage.getTotalPages(),
+        		contactPage.getContent()
         );
 
         return ResponseEntity.ok(response);
@@ -91,8 +93,14 @@ public class ContactController {
 
 
 
-        PaginatedResponse<Contact> response = new PaginatedResponse<Contact>(contactPage.getTotalPages(), 
-        		contactPage.getSize(), contactPage.getContent());
+
+        PaginatedResponse<Contact> response = new PaginatedResponse<>(
+        		contactPage.getTotalElements(),
+        		contactPage.getSize(),
+        		contactPage.getNumber(),
+        		contactPage.getTotalPages(),
+        		contactPage.getContent()
+        );
         return ResponseEntity.ok(response);
 
     }
