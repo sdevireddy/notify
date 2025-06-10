@@ -9,7 +9,7 @@ import java.util.Date;
 
 @Entity
 @Table(name = "accounts", indexes = {@Index(name = "idx_account_name", columnList = "accountName")})
-@NoArgsConstructor
+//@NoArgsConstructor
 @ToString
 public class Account {
 
