@@ -45,18 +45,15 @@ public class UserController {
     }
 
     // Create a new user
-    @PostMapping("/create")
-    public ResponseEntity<?> createUser(@RequestBody ZenUser user) {
-        try {
-            ZenUser createdUser = userService.createUser(user);
-            return ResponseEntity.status(HttpStatus.CREATED).body(createdUser);
-        } catch (IllegalArgumentException ex) {
-            return ResponseEntity.badRequest().body(ex.getMessage());
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Failed to create user");
-        }
-    }
+	/*
+	 * @PostMapping("/create") public ResponseEntity<?> createUser(@RequestBody
+	 * ZenUser user) { try { ZenUser createdUser = userService.createUser(user);
+	 * return ResponseEntity.status(HttpStatus.CREATED).body(createdUser); } catch
+	 * (IllegalArgumentException ex) { return
+	 * ResponseEntity.badRequest().body(ex.getMessage()); } catch (Exception ex) {
+	 * return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+	 * .body("Failed to create user"); } }
+	 */
 
     // Update an existing user
     @PutMapping("/{id}")
