@@ -10,17 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.util.List;
-
-import com.zen.dto.PaginatedResponse;
+import com.zen.notify.dto.PaginatedResponse;
 import com.zen.notify.entity.Contact;
-import com.zen.notify.entity.Deal;
 import com.zen.notify.entity.Lead;
 import com.zen.notify.search.LeadSearchCriteria;
 import com.zen.notify.service.LeadConversionService;
 import com.zen.notify.service.LeadService;
-
-import lombok.RequiredArgsConstructor;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
@@ -112,6 +107,8 @@ public class LeadController {
 	        );
 	        return ResponseEntity.ok(response);
 	    }
+	    
+	    
     
     
 }

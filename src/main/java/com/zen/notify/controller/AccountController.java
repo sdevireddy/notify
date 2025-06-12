@@ -1,7 +1,7 @@
 package com.zen.notify.controller;
 
 
-import com.zen.dto.PaginatedResponse;
+import com.zen.notify.dto.PaginatedResponse;
 import com.zen.notify.entity.Account;
 import com.zen.notify.entity.Lead;
 import com.zen.notify.search.AccountSearchCriteria;

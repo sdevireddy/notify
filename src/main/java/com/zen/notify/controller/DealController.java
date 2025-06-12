@@ -1,7 +1,7 @@
 package com.zen.notify.controller;
 
 
-import com.zen.dto.PaginatedResponse;
+import com.zen.notify.dto.PaginatedResponse;
 import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Deal;
 import com.zen.notify.search.DealSearchCriteria;

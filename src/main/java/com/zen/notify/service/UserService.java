@@ -5,9 +5,10 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.zen.notify.entity.User;
+import com.zen.notify.entity.ZenUser;
 import com.zen.notify.exceptions.UserNotFoundException;
 import com.zen.notify.repository.UserRepository;
 
@@ -16,32 +17,58 @@ public class UserService {
 
     @Autowired
     private UserRepository userRepository;
+    
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
-    public User getUserByUsername(String username) {
+    public ZenUser getUserByUsername(String username) {
         return userRepository.findByUsername(username)
                 .orElseThrow(() -> new UserNotFoundException(username));
     }
 
-    public User getUserByEmail(String email) {
+    public ZenUser getUserByEmail(String email) {
         return userRepository.findByEmail(email)
                 .orElseThrow(() -> new UserNotFoundException(email));
     }
 
-    public List<User> getAllUsers() {
+    public List<ZenUser> getAllUsers() {
         return userRepository.findAll();
     }
 
-    public User getUserById(Long id) {
+    public ZenUser getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserNotFoundException(id));
     }
 
-    public User createUser(User user) {
+    public ZenUser createUser(ZenUser user) {
+        // Basic validation for mandatory fields
+        if (user.getUsername() == null || user.getUsername().isEmpty()) {
+            throw new IllegalArgumentException("Username is required");
+        }
+        if (user.getEmail() == null || user.getEmail().isEmpty()) {
+            throw new IllegalArgumentException("Email is required");
+        }
+        if (user.getPasswordHash() == null || user.getPasswordHash().isEmpty()) {
+            throw new IllegalArgumentException("PasswordHash is required");
+        }
+
+        // Check if username or email already exists
+        if (userRepository.existsByUsername(user.getUsername())) {
+            throw new IllegalArgumentException("Username already exists");
+        }
+        if (userRepository.existsByEmail(user.getEmail())) {
+            throw new IllegalArgumentException("Email already exists");
+        }
+
+        // Set createdAt automatically via @PrePersist in entity
+        String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
+        user.setPasswordHash(hashedPassword);
+
         return userRepository.save(user);
     }
 
-    public User updateUser(Long id, User userDetails) {
-        User user = getUserById(id);
+    public ZenUser updateUser(Long id, ZenUser userDetails) {
+        ZenUser user = getUserById(id);
         user.setUsername(userDetails.getUsername());
         user.setEmail(userDetails.getEmail());
         //user.setPassword(userDetails.getPassword());
@@ -52,7 +79,7 @@ public class UserService {
         userRepository.deleteById(id);
     }
     
-    public Page<User> getUsersPaginated(int page, int pageSize) {
+    public Page<ZenUser> getUsersPaginated(int page, int pageSize) {
         PageRequest pageable = PageRequest.of(page, pageSize);
         return userRepository.findAll(pageable);
     }

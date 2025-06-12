@@ -8,7 +8,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 
 import com.zen.notify.entity.Lead;
-import com.zen.notify.entity.User;
+import com.zen.notify.entity.ZenUser;
 import com.zen.notify.repository.LeadRepository;
 import com.zen.notify.repository.UserRepository;
 import com.zen.notify.search.LeadSearchCriteria;

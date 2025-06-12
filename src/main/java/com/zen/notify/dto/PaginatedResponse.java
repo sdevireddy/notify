@@ -1,4 +1,4 @@
-package com.zen.dto;
+package com.zen.notify.dto;
 
 import java.util.List;
 
