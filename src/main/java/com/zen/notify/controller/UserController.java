@@ -105,7 +105,7 @@ public class UserController {
     	        ZenUser savedUser = userService.createUser(user);
     	        userDTO.setMessage("User Created Successfully");
     	        userDTO = mapToDTO(savedUser);
-    	        //emailService.sendAccountCreationEmail(savedUser.getEmail(), generatedPassword);
+    	        emailService.sendAccountCreationEmail(savedUser.getEmail(), generatedPassword);
     	        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
     	}catch(Exception aEx) {
     		 userDTO.setMessage(aEx.getMessage());
@@ -132,7 +132,7 @@ public class UserController {
 
     private ZenUser mapToEntity(UserDTO dto) {
         ZenUser user = new ZenUser();
-        user.setId(dto.getId()); 
+        //user.setId(dto.getId()); 
         user.setUsername(dto.getUsername());
         user.setEmail(dto.getEmail());
         user.setFirstName(dto.getFirstName());

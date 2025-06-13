@@ -42,11 +42,13 @@ public class LeadService {
 	    }
 
 	    public Lead createLead(Lead lead) {
+	    	System.out.println("Saving lead");
 	    	 Optional<Lead> existingContact = Optional.ofNullable(leadRepository.findByEmail(lead.getEmail()));
 
 	         if (existingContact.isPresent()) {
 	             throw new RuntimeException("Duplicate Lead: A contact with this email already exists.");
 	         }
+	         System.out.println("lead" + lead.toString());
 	        return leadRepository.save(lead);
 	    }
 

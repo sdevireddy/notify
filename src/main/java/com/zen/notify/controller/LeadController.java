@@ -10,9 +10,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import com.zen.notify.dto.LeadDTO;
 import com.zen.notify.dto.PaginatedResponse;
 import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Lead;
+import com.zen.notify.mapper.LeadMapper;
 import com.zen.notify.search.LeadSearchCriteria;
 import com.zen.notify.service.LeadConversionService;
 import com.zen.notify.service.LeadService;
@@ -61,8 +64,10 @@ public class LeadController {
 	    }
 
 	    @PostMapping
-	    public ResponseEntity<?> createLead(@RequestBody Lead lead) {
+	    public ResponseEntity<?> createLead(@RequestBody LeadDTO leadDto) {
 	    	 try {
+	    		 System.out.println("Controller lead " + leadDto.toString());
+	    		  Lead lead = LeadMapper.toEntity(leadDto);
 	             Lead createdContact = leadService.createLead(lead);
 	             return ResponseEntity.status(HttpStatus.SC_CREATED).body(createdContact);
 	         } catch (RuntimeException e) {
