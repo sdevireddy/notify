@@ -9,6 +9,7 @@ public class PaginatedResponse<T> {
 	    private int currentPage;
 	    private int totalPages;
 	    private List<T> data;
+	    private String message;
 
 	    public PaginatedResponse(long totalRecords, int pageSize, int currentPage, int totalPages, List<T> data) {
 	        this.totalRecords = totalRecords;
@@ -60,6 +61,15 @@ public class PaginatedResponse<T> {
 
 		public void setTotalRecords(long totalRecords) {
 			this.totalRecords = totalRecords;
+		}
+
+		public String getMessage() {
+			return message;
+		}
+
+		public void setMessage(String message) {
+			this.message = message;
 		} 
+		
 
 }

@@ -19,8 +19,15 @@ public class ZenUserDetailsService implements UserDetailsService {
 
     @Override
     public ZenUserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        ZenUser user = userRepository.findByUsername(username)
+        System.out.println("User name is " + username);
+    	ZenUser user = userRepository.findByUsername(username)
             .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        System.out.println("username is " + user.getUsername());
+        System.out.println("Password is " + user.getPassword());
+    	if (user == null) {
+        	  user = userRepository.findByEmail(username)
+        	            .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
+        }
         return new ZenUserDetails(user);
     }
 }

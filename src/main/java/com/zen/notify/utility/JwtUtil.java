@@ -1,7 +1,11 @@
 package com.zen.notify.utility;
 
 import io.jsonwebtoken.*;
+
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import com.zen.notify.filters.ZenUserDetails;
 
 import java.util.Date;
 import java.util.function.Function;
@@ -43,6 +47,21 @@ public class JwtUtil {
     }
 
     public Boolean validateToken(String token, String username) {
+    	System.out.println("Validate token");
+    	System.out.println("username" + username);
+    	System.out.println("token" + token);
         return (extractUsername(token).equals(username) && !isTokenExpired(token));
+    }
+    
+    public String generateRefreshToken(ZenUserDetails userDetails) {
+    	System.out.println("Validate token");
+    	System.out.println("username" + userDetails.getUsername());
+        return Jwts.builder()
+            .setSubject(userDetails.getUsername())
+            //.claim("roles", userDetails.getAuthorities().stream().map(GrantedAuthority::getAuthority).toList())
+            .setIssuedAt(new Date())
+            .setExpiration(new Date(System.currentTimeMillis() + 7 * 24 * 60 * 60 * 1000)) // 7 days
+            .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+            .compact();
     }
 }

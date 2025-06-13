@@ -23,8 +23,8 @@ public class ZenUser {
 	    private String email;
 
 	    @JsonIgnore
-	    @Column(name = "password_hash", nullable = true, length = 255)
-	    private String passwordHash;
+	    @Column(name = "password", nullable = true, length = 255)
+	    private String password;
 
 	    @Column(name = "first_name", length = 100)
 	    private String firstName;
@@ -120,12 +120,12 @@ public class ZenUser {
 			this.email = email;
 		}
 
-		public String getPasswordHash() {
-			return passwordHash;
+		public String getPassword() {
+			return password;
 		}
 
-		public void setPasswordHash(String passwordHash) {
-			this.passwordHash = passwordHash;
+		public void setPassword(String passwordHash) {
+			this.password = passwordHash;
 		}
 
 		public String getFirstName() {

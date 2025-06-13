@@ -49,7 +49,7 @@ public class InvitaitonController {
 	            ZenUser user = new ZenUser();
 	            user.setEmail(email.trim());
 	            user.setUsername(email.substring(0, email.indexOf('@'))); // simple username
-	            user.setPasswordHash(passwordEncoder.encode(tempPassword));
+	            user.setPassword(passwordEncoder.encode(tempPassword));
 	            user.setFirstLogin(true);
 	            user.setIsActive(true);
 
@@ -85,7 +85,7 @@ public class InvitaitonController {
 
 	        ZenUser user = new ZenUser();
 	        user.setEmail(email);
-	        user.setPasswordHash(passwordEncoder.encode(tempPassword));
+	        user.setPassword(passwordEncoder.encode(tempPassword));
 	        user.setFirstLogin(true);
 	        user.setIsActive(true);
 
@@ -105,11 +105,11 @@ public class InvitaitonController {
 	    ZenUser user = userRepository.findByUsername(request.getUsername())
 	        .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
-	    if (!passwordEncoder.matches(request.getOldPassword(), user.getPasswordHash())) {
+	    if (!passwordEncoder.matches(request.getOldPassword(), user.getPassword())) {
 	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Old password is incorrect");
 	    }
 
-	    user.setPasswordHash(passwordEncoder.encode(request.getNewPassword()));
+	    user.setPassword(passwordEncoder.encode(request.getNewPassword()));
 	    user.setFirstLogin(false);
 	    userRepository.save(user);
 

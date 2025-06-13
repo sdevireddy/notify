@@ -48,7 +48,7 @@ public class UserService {
         if (user.getEmail() == null || user.getEmail().isEmpty()) {
             throw new IllegalArgumentException("Email is required");
         }
-        if (user.getPasswordHash() == null || user.getPasswordHash().isEmpty()) {
+        if (user.getPassword() == null || user.getPassword().isEmpty()) {
             throw new IllegalArgumentException("PasswordHash is required");
         }
 
@@ -60,9 +60,11 @@ public class UserService {
             throw new IllegalArgumentException("Email already exists");
         }
 
-        // Set createdAt automatically via @PrePersist in entity
-        String hashedPassword = passwordEncoder.encode(user.getPasswordHash());
-        user.setPasswordHash(hashedPassword);
+		/*
+		 * // Set createdAt automatically via @PrePersist in entity String
+		 * hashedPassword = passwordEncoder.encode(user.getPassword());
+		 * user.setPassword(hashedPassword);
+		 */
 
         return userRepository.save(user);
     }

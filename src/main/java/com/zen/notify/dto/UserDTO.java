@@ -4,6 +4,9 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
+
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class UserDTO {
 
     private Long id;
@@ -14,7 +17,7 @@ public class UserDTO {
     private String phoneNumber;
     private Boolean isActive;
     private Instant lastLogin;
-    private Instant createdAt;
+    private Instant createdAt = Instant.now();
     private Instant updatedAt;
     private String profilePictureUrl;
     private String timezone;
@@ -28,6 +31,7 @@ public class UserDTO {
     private Boolean accountLocked;
     private Boolean twoFactorEnabled;
     private String securityQuestion;
+    private String message;
 	public Long getId() {
 		return id;
 	}
@@ -159,6 +163,13 @@ public class UserDTO {
 	}
 	public void setSecurityQuestion(String securityQuestion) {
 		this.securityQuestion = securityQuestion;
+	}
+	
+	public String getMessage() {
+		return message;
+	}
+	public void setMessage(String message) {
+		this.message = message;
 	}
 	@Override
 	public int hashCode() {

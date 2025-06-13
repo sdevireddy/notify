@@ -33,7 +33,7 @@ public class ZenUserDetails implements UserDetails {
 
 	    @Override
 	    public String getPassword() {
-	        return user.getPasswordHash();
+	        return user.getPassword();
 	    }
 
 	    @Override
@@ -48,7 +48,11 @@ public class ZenUserDetails implements UserDetails {
 
 	    @Override
 	    public boolean isAccountNonLocked() {
-	        return !user.getAccountLocked(); // Assumes getAccountLocked() returns boolean
+	    	if (user.getAccountLocked() == null) {
+	    		return true;
+	    	} else {
+	    		return !user.getAccountLocked();
+	    	}
 	    }
 
 	    @Override

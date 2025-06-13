@@ -95,13 +95,24 @@ public class UserController {
     
     @PostMapping("/create")
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO userCreateDTO) {
-        String generatedPassword = generateRandomPassword();
-        ZenUser user = mapToEntity(userCreateDTO);
-        user.setPasswordHash(passwordEncoder.encode(generatedPassword));
-        ZenUser savedUser = userService.createUser(user);
-        UserDTO userDTO = mapToDTO(savedUser);
-        emailService.sendAccountCreationEmail(savedUser.getEmail(), generatedPassword);
-        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+    	 UserDTO userDTO = new UserDTO();
+    	 userDTO.setMessage("User Created Successfully");
+    	try {
+    		 String generatedPassword = generateRandomPassword();
+    	        System.out.println("password is - " + generatedPassword);
+    	        ZenUser user = mapToEntity(userCreateDTO);
+    	        user.setPassword(passwordEncoder.encode(generatedPassword));
+    	        ZenUser savedUser = userService.createUser(user);
+    	        userDTO.setMessage("User Created Successfully");
+    	        userDTO = mapToDTO(savedUser);
+    	        //emailService.sendAccountCreationEmail(savedUser.getEmail(), generatedPassword);
+    	        return new ResponseEntity<>(userDTO, HttpStatus.CREATED);
+    	}catch(Exception aEx) {
+    		 userDTO.setMessage(aEx.getMessage());
+    		 aEx.printStackTrace();
+    		 return new ResponseEntity<>(userDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+    	}
+       
     }
 
 
