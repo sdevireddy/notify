@@ -9,6 +9,7 @@ public class AuthResponse {
     private String access_token;
     private int expires_in;
     private String refresh_token;
+    private List<String> modules;
     
 	public String getUsername() {
 		return username;
@@ -45,6 +46,15 @@ public class AuthResponse {
 	}
 	public void setRefresh_token(String refresh_token) {
 		this.refresh_token = refresh_token;
+	}
+	public AuthResponse() {
+		super();
+	}
+	public List<String> getModules() {
+		return modules;
+	}
+	public void setModules(List<String> modules) {
+		this.modules = modules;
 	}
 
 

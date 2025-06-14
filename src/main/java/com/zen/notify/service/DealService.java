@@ -3,6 +3,7 @@ package com.zen.notify.service;
 
 import com.zen.notify.entity.Deal;
 import com.zen.notify.entity.Lead;
+import com.zen.notify.mapper.DealMapper;
 import com.zen.notify.repository.DealRepository;
 import com.zen.notify.search.DealSearchCriteria;
 import com.zen.notify.search.DealSpecification;
@@ -30,9 +31,8 @@ public class DealService {
     public Deal createDeal(Deal deal) {
     	deal.setCreatedAt(new Date());
     	deal.setUpdatedAt(new Date());
-        return dealRepository.save(deal);
-    }
-
+            return dealRepository.save(deal);
+        }
     // Get All Deals
     public List<Deal> getAllDeals() {
         return dealRepository.findAll();

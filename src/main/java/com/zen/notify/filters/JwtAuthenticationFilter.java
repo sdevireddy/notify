@@ -35,6 +35,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		  
 		  String username = null; String jwt = null;
 		  
+		  System.out.println("JWT Filter triggered for: " + request.getRequestURI());
+		  
 		  if (authorizationHeader != null && authorizationHeader.startsWith("Bearer "))
 		  { jwt = authorizationHeader.substring(7); try { username =
 		  jwtUtil.extractUsername(jwt); } catch (Exception e) {
@@ -46,7 +48,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		  ZenUserDetails userDetails = userDetailsService.loadUserByUsername(username);
 		  
 		  if (jwtUtil.validateToken(jwt, userDetails.getUsername())) { if
-		  (!userDetails.isFirstLogin() &&
+		  (userDetails.isFirstLogin() &&
 		  !request.getRequestURI().contains("/reset-password")) {
 		  response.setStatus(HttpServletResponse.SC_FORBIDDEN);
 		  response.getWriter().write("First-time login: password reset required");

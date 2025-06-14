@@ -15,7 +15,7 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.zen.notify.filters.JwtRequestFilter;
+import com.zen.notify.filters.JwtAuthenticationFilter;
 import com.zen.notify.service.ZenUserDetailsService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -30,7 +30,7 @@ public class SecurityConfig {
     private ZenUserDetailsService userDetailsService;
 
     @Autowired
-    private JwtRequestFilter jwtRequestFilter;
+    private JwtAuthenticationFilter jwtAuthenticationFilter;
 
 	/*
 	 * @Bean public AuthenticationManager authManager(HttpSecurity http) throws
@@ -57,12 +57,13 @@ public class SecurityConfig {
         http
             .csrf().disable()
             .authorizeHttpRequests(auth -> auth
-            	.requestMatchers("/**").permitAll()
+            	//.requestMatchers("/**").permitAll()
                 .requestMatchers("/api/authenticate").permitAll() 
-                .requestMatchers("/api/users/create", "/api/users/login").permitAll()
+                .requestMatchers("/api/users/create", "/api/login").permitAll()
                 .anyRequest().authenticated()
             )
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); 
             
 
         return http.build();

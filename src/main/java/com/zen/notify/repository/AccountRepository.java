@@ -12,5 +12,6 @@ import com.zen.notify.entity.Lead;
 @Repository
 public interface AccountRepository extends JpaRepository<Account, Long>, JpaSpecificationExecutor<Account> {
 	Optional<Account> findByAccountName(String accountName);
+	Optional<Account> findById(Long id);
 }
 

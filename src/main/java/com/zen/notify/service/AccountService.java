@@ -3,6 +3,7 @@ package com.zen.notify.service;
 
 
 import com.zen.notify.entity.Account;
+import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Lead;
 import com.zen.notify.repository.AccountRepository;
 import com.zen.notify.search.AccountSearchCriteria;
@@ -83,5 +84,9 @@ public class AccountService {
         Specification<Account> spec = new AccountSpecification(criteria);
         return accountRepository.findAll(spec, pageable);
     }
+
+	public Optional<Account> findById(Long accountId) {
+		return  accountRepository.findById(accountId);
+	}
 
 }

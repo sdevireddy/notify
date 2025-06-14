@@ -14,6 +14,6 @@ import java.util.Optional;
 @Repository
 public interface ContactRepository extends JpaRepository<Contact, Long>, JpaSpecificationExecutor<Contact> {
     List<Contact> findByAccount_AccountId(Long accountId);
-    Optional findById(Long id);
+    Optional<Contact> findById(Long id);
+	Optional<Contact> findByEmail(String email);
 }
-

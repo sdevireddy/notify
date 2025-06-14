@@ -1,7 +1,7 @@
 package com.zen.notify.controller;
 
 import java.util.List;
-
+import java.util.Map;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,19 +38,20 @@ public class LeadController {
 		 */
 	    
 	    @GetMapping
-	    public ResponseEntity<PaginatedResponse<Lead>> getAllLeads(
+	    public ResponseEntity<PaginatedResponse<LeadDTO>> getAllLeads(
 	            @RequestParam(defaultValue = "0") int page,
 	            @RequestParam(defaultValue = "10") int pageSize) {
 
 	        Page<Lead> leadsPage = leadService.getLeadsPaginated(page, pageSize);
+	        Page<LeadDTO> leadsDtoPage = leadsPage.map(LeadMapper::toDto);
 
 
-	        PaginatedResponse<Lead> response = new PaginatedResponse<>(
+	        PaginatedResponse<LeadDTO> response = new PaginatedResponse<>(
 	        		leadsPage.getTotalElements(),
 	        		leadsPage.getSize(),
 	        		leadsPage.getNumber(),
 	        		leadsPage.getTotalPages(),
-	        		leadsPage.getContent()
+	        		leadsDtoPage.getContent()
 	        );
 
 
@@ -58,9 +59,18 @@ public class LeadController {
 	    }
 	    
 	    @GetMapping("/{id}")
-	    public ResponseEntity<Lead> getLeadById(@PathVariable Long id) {
-	        Lead lead = leadService.getLeadById(id);
-	        return lead != null ? ResponseEntity.ok(lead) : ResponseEntity.notFound().build();
+	    public ResponseEntity<?> getLeadById(@PathVariable Long id) {
+	    	try {
+	    		 Lead lead = leadService.getLeadById(id);
+	 	        LeadDTO leadDto = LeadMapper.toDto(lead);
+	 	        return leadDto != null ? ResponseEntity.ok(leadDto) : ResponseEntity.notFound().build();
+	    	}catch(Exception aEx) {
+	    		 return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(Map.of(
+	                     "error", "Duplicate contact",
+	                     "message", aEx.getMessage()
+	                 ));
+	    	}
+	       
 	    }
 
 	    @PostMapping
@@ -68,17 +78,31 @@ public class LeadController {
 	    	 try {
 	    		 System.out.println("Controller lead " + leadDto.toString());
 	    		  Lead lead = LeadMapper.toEntity(leadDto);
-	             Lead createdContact = leadService.createLead(lead);
-	             return ResponseEntity.status(HttpStatus.SC_CREATED).body(createdContact);
+	             Lead createdLead = leadService.createLead(lead);
+	             LeadDTO savedLeadDto = LeadMapper.toDto(createdLead);
+	             return ResponseEntity.status(HttpStatus.SC_CREATED).body(savedLeadDto);
 	         } catch (RuntimeException e) {
-	             return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(e.getMessage()); // HTTP 409 Conflict
+	        	 return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(Map.of(
+	                     "error", "Duplicate Lead",
+	                     "message", e.getMessage()
+	                 ));
+	             //return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(e.getMessage()); // HTTP 409 Conflict
 	         }
 	    }
 
 	    @PutMapping("/{id}")
-	    public ResponseEntity<Lead> updateLead(@PathVariable Long id, @RequestBody Lead leadDetails) {
+	    public ResponseEntity<?> updateLead(@PathVariable Long id, @RequestBody Lead leadDetails) {
 	        Lead updatedLead = leadService.updateLead(id, leadDetails);
-	        return updatedLead != null ? ResponseEntity.ok(updatedLead) : ResponseEntity.notFound().build();
+	        try {
+	        	  LeadDTO savedLeadDto = LeadMapper.toDto(updatedLead);
+	  	        return updatedLead != null ? ResponseEntity.ok(savedLeadDto) : ResponseEntity.notFound().build();
+	        }catch(Exception aEx) {
+	        	 return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(Map.of(
+	                     "error", "Lead Update Failed!!!",
+	                     "message", aEx.getMessage()
+	                 ));
+	        }
+	      
 	    }
 
 	    @DeleteMapping("/{id}")
@@ -100,17 +124,25 @@ public class LeadController {
 	            @RequestBody LeadSearchCriteria criteria,
 	            @RequestParam(defaultValue = "0") int page,
 	            @RequestParam(defaultValue = "10") int size) {
+	    	try {
+	    		 Page<Lead> leadPage = leadService.searchLeads(criteria, page, size);
+	    		   Page<LeadDTO> leadsDtoPage = leadPage.map(LeadMapper::toDto);
 
-	        Page<Lead> leadPage = leadService.searchLeads(criteria, page, size);
+	 	        PaginatedResponse<LeadDTO> response = new PaginatedResponse<>(
+	 	        		leadPage.getTotalElements(),
+	 	        		leadPage.getSize(),
+	 	        		leadPage.getNumber(),
+	 	        		leadPage.getTotalPages(),
+	 	        		leadsDtoPage.getContent()
+	 	        );
+	 	        return ResponseEntity.ok(response);
+	    	}catch(Exception aEx) {
+	    		return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(Map.of(
+	                     "error", "Lead Search Failed!!",
+	                     "message", aEx.getMessage()));
+	    	}
 
-	        PaginatedResponse<Lead> response = new PaginatedResponse<>(
-	        		leadPage.getTotalElements(),
-	        		leadPage.getSize(),
-	        		leadPage.getNumber(),
-	        		leadPage.getTotalPages(),
-	        		leadPage.getContent()
-	        );
-	        return ResponseEntity.ok(response);
+	       
 	    }
 	    
 	    

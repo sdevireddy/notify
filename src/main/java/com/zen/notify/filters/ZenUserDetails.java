@@ -2,6 +2,7 @@ package com.zen.notify.filters;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -64,4 +65,14 @@ public class ZenUserDetails implements UserDetails {
 	    public boolean isEnabled() {
 	        return user.getIsActive(); // Assumes getIsActive() returns boolean
 	    }
+
+		public List<String> getRoleNames() {
+			// TODO Auto-generated method stub
+			return null;
+		}
+
+		public List<String> getModules() {
+			// TODO Auto-generated method stub
+			return null;
+		}
 	}
