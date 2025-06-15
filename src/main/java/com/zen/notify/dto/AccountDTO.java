@@ -1,92 +1,30 @@
-package com.zen.notify.entity;
-
-
-import jakarta.persistence.*;
-import lombok.*;
+package com.zen.notify.dto;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-@Entity
-@Table(name = "accounts", indexes = {@Index(name = "idx_account_name", columnList = "accountName")})
-//@NoArgsConstructor
-@ToString
-public class Account {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "accountId") 
+public class AccountDTO {
     private Long accountId;
-
-    @Column(nullable = true, length = 100)
     private String accountOwner;
-
-    @Column(nullable = false, unique = true, length = 255)
     private String accountName;
-
     private String accountSite;
-
-    @ManyToOne
-    @JoinColumn(name = "parent_account_id", foreignKey = @ForeignKey(name = "fk_account_parent"), nullable=true)
-    private Account parentAccount;
-
-    @Column(unique = true, length = 50)
+    private Long parentAccountId;
     private String accountNumber;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private AccountType accountType;
-
+    private String accountType;
     private String industry;
-
-    @Column(precision = 15, scale = 2)
     private BigDecimal annualRevenue;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 10)
-    private Rating rating;
-
+    private String rating;
     private String phone;
     private String fax;
     private String website;
     private String tickerSymbol;
-
-    @Enumerated(EnumType.STRING)
-    @Column(length = 20)
-    private Ownership ownership;
-
-
-    @Column(length = 50)
+    private String ownership;
     private String sicCode;
+    private Date createdAt;
+    private Date updatedAt;
 
-    @Temporal(TemporalType.TIMESTAMP)
-    @Column(nullable = false, updatable = false)
-    private Date createdAt = new Date();
-
-    @Temporal(TemporalType.TIMESTAMP)
-    private Date updatedAt = new Date();
-
-    @PreUpdate
-    public void setLastUpdated() {
-        this.updatedAt = new Date();
-    }
-    
-    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
-    private List<Contact> contacts = new ArrayList<>();
-
-    public enum AccountType {
-        CUSTOMER, PARTNER, VENDOR, PROSPECT, OTHER
-    }
-
-    public enum Rating {
-        HOT, WARM, COLD
-    }
-
-    public enum Ownership {
-        PUBLIC, PRIVATE, SUBSIDIARY, OTHER
-    }
+    private List<ContactDTO> contacts;
 
 	public Long getAccountId() {
 		return accountId;
@@ -120,12 +58,12 @@ public class Account {
 		this.accountSite = accountSite;
 	}
 
-	public Account getParentAccount() {
-		return parentAccount;
+	public Long getParentAccountId() {
+		return parentAccountId;
 	}
 
-	public void setParentAccount(Account parentAccount) {
-		this.parentAccount = parentAccount;
+	public void setParentAccountId(Long parentAccountId) {
+		this.parentAccountId = parentAccountId;
 	}
 
 	public String getAccountNumber() {
@@ -136,11 +74,11 @@ public class Account {
 		this.accountNumber = accountNumber;
 	}
 
-	public AccountType getAccountType() {
+	public String getAccountType() {
 		return accountType;
 	}
 
-	public void setAccountType(AccountType accountType) {
+	public void setAccountType(String accountType) {
 		this.accountType = accountType;
 	}
 
@@ -160,11 +98,11 @@ public class Account {
 		this.annualRevenue = annualRevenue;
 	}
 
-	public Rating getRating() {
+	public String getRating() {
 		return rating;
 	}
 
-	public void setRating(Rating rating) {
+	public void setRating(String rating) {
 		this.rating = rating;
 	}
 
@@ -200,14 +138,13 @@ public class Account {
 		this.tickerSymbol = tickerSymbol;
 	}
 
-	public Ownership getOwnership() {
+	public String getOwnership() {
 		return ownership;
 	}
 
-	public void setOwnership(Ownership ownership) {
+	public void setOwnership(String ownership) {
 		this.ownership = ownership;
 	}
-
 
 	public String getSicCode() {
 		return sicCode;
@@ -232,25 +169,14 @@ public class Account {
 	public void setUpdatedAt(Date updatedAt) {
 		this.updatedAt = updatedAt;
 	}
-	
-	public List<Contact> getContacts() {
-	    return contacts;
+
+	public List<ContactDTO> getContacts() {
+		return contacts;
 	}
 
-	public void setContacts(List<Contact> contacts) {
-	    this.contacts = contacts;
-	    if (contacts != null) {
-	        for (Contact contact : contacts) {
-	            contact.setAccount(this); // Maintain bidirectional consistency
-	        }
-	    }
+	public void setContacts(List<ContactDTO> contacts) {
+		this.contacts = contacts;
 	}
-
-	public Account() {
-		
-	}
-
-
-	
+    
+    
 }
-

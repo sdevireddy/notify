@@ -2,6 +2,7 @@ package com.zen.notify.service;
 
 
 
+import com.zen.notify.dto.AccountUpdateDTO;
 import com.zen.notify.entity.Account;
 import com.zen.notify.entity.Contact;
 import com.zen.notify.entity.Lead;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.elasticsearch.ResourceNotFoundException;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Date;
@@ -52,27 +54,37 @@ public class AccountService {
         return accountRepository.findAll(pageable);
     }
 
-    // Update Account
-    public Account updateAccount(Long accountId, Account accountDetails) {
-        return accountRepository.findById(accountId).map(account -> {
-            account.setAccountOwner(accountDetails.getAccountOwner());
-            account.setAccountName(accountDetails.getAccountName());
-            account.setAccountSite(accountDetails.getAccountSite());
-            account.setParentAccount(accountDetails.getParentAccount());
-            account.setAccountNumber(accountDetails.getAccountNumber());
-            account.setAccountType(accountDetails.getAccountType());
-            account.setIndustry(accountDetails.getIndustry());
-            account.setAnnualRevenue(accountDetails.getAnnualRevenue());
-            account.setRating(accountDetails.getRating());
-            account.setPhone(accountDetails.getPhone());
-            account.setFax(accountDetails.getFax());
-            account.setWebsite(accountDetails.getWebsite());
-            account.setTickerSymbol(accountDetails.getTickerSymbol());
-            account.setOwnership(accountDetails.getOwnership());
-            account.setSicCode(accountDetails.getSicCode());
-            return accountRepository.save(account);
-        }).orElseThrow(() -> new RuntimeException("Account not found"));
+    public Account updateAccount(Long id, AccountUpdateDTO dto) {
+        Account existing = accountRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Account not found"));
+
+        existing.setAccountOwner(dto.getAccountOwner());
+        existing.setAccountName(dto.getAccountName());
+        existing.setAccountSite(dto.getAccountSite());
+        existing.setPhone(dto.getPhone());
+        existing.setFax(dto.getFax());
+        existing.setWebsite(dto.getWebsite());
+        existing.setIndustry(dto.getIndustry());
+        existing.setAnnualRevenue(dto.getAnnualRevenue());
+        existing.setAccountType(dto.getAccountType());
+        existing.setRating(dto.getRating());
+        existing.setOwnership(dto.getOwnership());
+        existing.setTickerSymbol(dto.getTickerSymbol());
+        existing.setSicCode(dto.getSicCode());
+        existing.setAccountNumber(dto.getAccountNumber());
+
+        // Set parent account if provided
+        if (dto.getParentAccountId() != null) {
+            Account parent = accountRepository.findById(dto.getParentAccountId())
+                .orElseThrow(() -> new ResourceNotFoundException("Parent Account not found"));
+            existing.setParentAccount(parent);
+        } else {
+            existing.setParentAccount(null);
+        }
+
+        return accountRepository.save(existing);
     }
+
 
     // Delete Account
     public void deleteAccount(Long accountId) {

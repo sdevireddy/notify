@@ -81,48 +81,74 @@ public class DealController {
 	 */
     
     @GetMapping
-    public ResponseEntity<PaginatedResponse<?>> getAllDeals(
+    public ResponseEntity<?> getAllDeals(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize) {
-    	
-    	try {
+        try {
+            Page<Deal> dealPage = dealService.getDealsPaginated(page, pageSize);
+            Page<DealDTO> deals = dealPage.map(DealMapper::toDTO);
 
-        Page<Deal> dealPage = dealService.getDealsPaginated(page, pageSize);
-        Page<DealDTO> deals = dealPage.map(DealMapper::toDTO);
+            PaginatedResponse<?> response = new PaginatedResponse<>(
+                    dealPage.getTotalElements(),
+                    dealPage.getSize(),
+                    dealPage.getNumber(),
+                    dealPage.getTotalPages(),
+                    deals.getContent()
+            );
 
-        PaginatedResponse<?> response = new PaginatedResponse<>(
-        		dealPage.getTotalElements(),
-        		dealPage.getSize(),
-        		dealPage.getNumber(),
-        		dealPage.getTotalPages(),
-        		deals.getContent()
-        );
-
-        return ResponseEntity.ok(response);
-    	}
-        catch(Exception aEx) {
-        	 return null;
-    	}
-        
+            return ResponseEntity.ok(response);
+        } catch (Exception ex) {
+            String errorMessage = "Failed to fetch deals. Reason: " + ex.getMessage();
+            return ResponseEntity
+                    .status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", errorMessage));
+        }
     }
     
-    // Get Deal by ID
     @GetMapping("/{id}")
-    public ResponseEntity<Optional<Deal>> getDealById(@PathVariable Long id) {
-        return ResponseEntity.ok(dealService.getDealById(id));
+    public ResponseEntity<?> getDealById(@PathVariable Long id) {
+        Optional<Deal> dealOpt = dealService.getDealById(id);
+
+        if (dealOpt.isPresent()) {
+            DealDTO dealDTO = DealMapper.toDTO(dealOpt.get());
+            return ResponseEntity.ok(dealDTO);
+        } else {
+            return ResponseEntity
+                    .status(HttpStatus.SC_NOT_FOUND)
+                    .body(Map.of("error", "Deal not found with ID: " + id));
+        }
     }
 
     // Update Deal
     @PutMapping("/{id}")
-    public ResponseEntity<Deal> updateDeal(@PathVariable Long id, @RequestBody Deal dealDetails) {
-        return ResponseEntity.ok(dealService.updateDeal(id, dealDetails));
+    public ResponseEntity<?> updateDeal(@PathVariable Long id, @RequestBody DealDTO dealDTO) {
+        try {
+            Deal dealEntity = DealMapper.toEntity(dealDTO); // Convert DTO to entity
+            Deal updatedDeal = dealService.updateDeal(id, dealEntity); // Pass to service
+
+            DealDTO responseDTO = DealMapper.toDTO(updatedDeal); // Convert updated entity back to DTO
+            return ResponseEntity.ok(responseDTO);
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND)
+                    .body(Map.of("error", ex.getMessage()));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to update deal"));
+        }
     }
 
-    // Delete Deal
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteDeal(@PathVariable Long id) {
-        dealService.deleteDeal(id);
-        return ResponseEntity.ok("Deal deleted successfully");
+    public ResponseEntity<?> deleteDeal(@PathVariable Long id) {
+        try {
+            dealService.deleteDeal(id);
+            return ResponseEntity.ok("Deal deleted successfully");
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND)
+                    .body(Map.of("error", "Deal not found with ID: " + id));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to delete deal"));
+        }
     }
     
     @PostMapping("/search")
@@ -130,16 +156,25 @@ public class DealController {
             @RequestBody DealSearchCriteria criteria,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
+        try {
+            Page<Deal> dealPage = dealService.searchDeals(criteria, page, size);
 
-        Page<Deal> dealPage = dealService.searchDeals(criteria, page, size);
-        PaginatedResponse<Deal> response = new PaginatedResponse<>(
-        		dealPage.getTotalElements(),
-        		dealPage.getSize(),
-        		dealPage.getNumber(),
-        		dealPage.getTotalPages(),
-        		dealPage.getContent()
-        );
-        return ResponseEntity.ok(response);
+            Page<DealDTO> dealDTOPage = dealPage.map(DealMapper::toDTO); // Map to DTO
+
+            PaginatedResponse<DealDTO> response = new PaginatedResponse<>(
+                    dealDTOPage.getTotalElements(),
+                    dealDTOPage.getSize(),
+                    dealDTOPage.getNumber(),
+                    dealDTOPage.getTotalPages(),
+                    dealDTOPage.getContent()
+            );
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "Failed to search deals: " + ex.getMessage()));
+        }
     }
     
 }
