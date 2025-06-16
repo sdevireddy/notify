@@ -95,6 +95,13 @@ public class AuthController {
         refreshCookie.setPath("/");    // Make cookie available to all paths
         refreshCookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
         response.addCookie(refreshCookie);
+        
+        Cookie tokenhCookie = new Cookie("access_token", accessToken);
+        refreshCookie.setHttpOnly(true);
+        refreshCookie.setSecure(true); // Use only with HTTPS
+        refreshCookie.setPath("/");    // Make cookie available to all paths
+        refreshCookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+        response.addCookie(tokenhCookie);
 
         // Step 5: Return access token and user info
         AuthResponse authResponse = new AuthResponse();
@@ -102,7 +109,6 @@ public class AuthController {
         authResponse.setUsername(userDetails.getUsername());
         authResponse.setRoles(userDetails.getRoleNames()); // Assuming this returns a list
         authResponse.setModules(userDetails.getModules()); // Assuming this returns a list
-
         return ResponseEntity.ok(authResponse);
     }
     

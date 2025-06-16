@@ -95,6 +95,12 @@ public class ZenUser {
 	    @Column(name = "firstlogin")
 	    private boolean firstLogin = true;
 
+	    @PrePersist
+	    public void prePersist() {
+	        if (isActive == null) {
+	            isActive = true;
+	        }
+	    }
 
 		public Long getId() {
 			return id;
@@ -151,10 +157,11 @@ public class ZenUser {
 		public void setPhoneNumber(String phoneNumber) {
 			this.phoneNumber = phoneNumber;
 		}
-
+		
 		public Boolean getIsActive() {
-			return isActive;
+		    return isActive != null ? isActive : Boolean.TRUE;
 		}
+		
 
 		public void setIsActive(Boolean isActive) {
 			this.isActive = isActive;
