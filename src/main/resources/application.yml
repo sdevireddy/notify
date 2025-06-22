@@ -21,27 +21,26 @@ spring:
     username: sendtosankar@gmail.com
     password: apsg dsyc izdh yrht
     properties:
-      mail.smtp.auth: true
-      mail.smtp.starttls.enable: true
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 eureka:
   client:
+    register-with-eureka: true
+    fetch-registry: true
     service-url:
       defaultZone: http://localhost:8767/eureka
 
 server:
   port: 8083
 
-  logging:
-    level:
-      org.springframework.security: DEBUG
-      org.springframework.security.web.FilterChainProxy: DEBUG
-      org.springframework.cloud.loadbalancer: DEBUG
-      org.springframework.cloud.gateway: DEBUG
-      org.springframework.cloud.gateway.route.RouteDefinitionLocator: DEBUG
-      com.netflix.discovery: DEBUG
-      org.springframework.cloud.netflix.eureka: DEBUG
-    file:
-      name: logs/crm-debug.log
-    pattern:
-      console: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%X{sessionId}] %-5level %logger{36} - %msg%n"
+logging:
+  level:
+    com.zen.notify: DEBUG
+  file:
+    name: logs/crm-debug.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%X{sessionId}] %-5level %logger{36} - %msg%n"
