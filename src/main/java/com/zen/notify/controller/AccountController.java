@@ -22,7 +22,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/api/accounts")
+@RequestMapping("/crm/accounts")
 public class AccountController {
 
     @Autowired

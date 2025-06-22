@@ -13,7 +13,7 @@ import java.util.function.Function;
 @Component
 public class JwtUtil {
 
-    private final String SECRET_KEY = "secret"; // use env variable in production
+    private final String SECRET_KEY = "G9MzZjTz2Mm89rL1RL9Jb9vP0rf4pKukwH3XzOvQduE="; // use env variable in production
     private final long EXPIRATION_TIME = 1000 * 60 * 60; // 1 hour
 
     public String extractUsername(String token) {

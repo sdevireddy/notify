@@ -22,7 +22,7 @@ import com.zen.notify.service.LeadService;
 
 @CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/api/leads")
+@RequestMapping("/crm/leads")
 @RequiredArgsConstructor
 public class LeadController {
 
@@ -73,7 +73,7 @@ public class LeadController {
 	       
 	    }
 
-	    @PostMapping
+	    @PostMapping("/create")
 	    public ResponseEntity<?> createLead(@RequestBody LeadDTO leadDto) {
 	    	 try {
 	    		 System.out.println("Controller lead " + leadDto.toString());

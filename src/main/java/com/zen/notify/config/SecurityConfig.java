@@ -23,74 +23,45 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
-@EnableWebSecurity
+//@EnableWebSecurity
 public class SecurityConfig {
-    
-    @Autowired
-    private ZenUserDetailsService userDetailsService;
+	
+	  @Autowired private ZenUserDetailsService userDetailsService;
+	  
+	  @Autowired private JwtAuthenticationFilter jwtAuthenticationFilter;
+	  
+	  
+	  @Bean
+	  
+	  public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+	  http.csrf().disable().authorizeHttpRequests(auth -> auth //
+	  .requestMatchers("/**").permitAll()
+	  //.requestMatchers("/api/authenticate").permitAll().requestMatchers(
+	 // "/api/users/create", "/api/login") .permitAll()
+	  .anyRequest().authenticated())
+	  .sessionManagement(sess ->
+	  sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+	  .addFilterBefore(jwtAuthenticationFilter,
+	  UsernamePasswordAuthenticationFilter.class);
+	  
+	  return http.build(); }
+	  
+	  
+	  @Bean public WebMvcConfigurer corsConfigurer() { return new
+	  WebMvcConfigurer() {
+	  
+	  @Override public void addCorsMappings(CorsRegistry registry) {
+	  registry.addMapping("/**") // allow all paths
+	  .allowedOrigins("http://localhost:3000") // frontend origin
+	  .allowedMethods("GET", "POST", "PUT", "DELETE",
+	  "OPTIONS").allowedHeaders("*") .allowCredentials(true); } }; }
+	  
+	  @Bean public AuthenticationManager
+	  authenticationManager(AuthenticationConfiguration config) throws Exception {
+	  return config.getAuthenticationManager(); }
+	  
+	  @Bean public PasswordEncoder passwordEncoder() { return new
+	  BCryptPasswordEncoder(); }
+	 
 
-    @Autowired
-    private JwtAuthenticationFilter jwtAuthenticationFilter;
-
-	/*
-	 * @Bean public AuthenticationManager authManager(HttpSecurity http) throws
-	 * Exception { return http.getSharedObject(AuthenticationManagerBuilder.class)
-	 * .userDetailsService(userDetailsService) .and().build(); }
-	 */
-	/*
-	 * @Bean public SecurityFilterChain filterChain(HttpSecurity http) throws
-	 * Exception { http.csrf().disable() .authorizeRequests()
-	 * .requestMatchers("/crm/api/authenticate").permitAll()
-	 * .requestMatchers("/api/users/create", "/api/users/login").permitAll()
-	 * .anyRequest().authenticated() .and() .sessionManagement()
-	 * .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-	 * 
-	 * http.addFilterBefore(jwtRequestFilter,
-	 * UsernamePasswordAuthenticationFilter.class);
-	 * 
-	 * return http.build(); }
-	 */
-    
-    @Bean
-    
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-            .csrf().disable()
-            .authorizeHttpRequests(auth -> auth
-            	//.requestMatchers("/**").permitAll()
-                .requestMatchers("/api/authenticate").permitAll() 
-                .requestMatchers("/api/users/create", "/api/login").permitAll()
-                .anyRequest().authenticated()
-            )
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); 
-            
-
-        return http.build();
-    }
-    
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            @Override
-            public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**") // allow all paths
-                        .allowedOrigins("http://localhost:3000") // frontend origin
-                        .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
-                        .allowedHeaders("*")
-                        .allowCredentials(true);
-            }
-        };
-    }
-    
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration config) throws Exception {
-        return config.getAuthenticationManager();
-    }
-
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
 }
-

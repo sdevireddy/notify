@@ -24,7 +24,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/crm")
 public class AuthController {
 
     @Autowired
