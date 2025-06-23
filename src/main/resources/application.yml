@@ -1,0 +1,60 @@
+spring:
+  application:
+    name: crm-service
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/
+    username: root
+    password: password
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000 # 5 minutes
+      max-lifetime: 1800000 # 30 minutes
+      connection-timeout: 30000 # 30 seconds
+      pool-name: MasterHikariPool
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+      naming:
+        physical-strategy: org.hibernate.boot.model.naming.PhysicalNamingStrategyStandardImpl
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+        multiTenancy: SCHEMA
+        tenant_identifier_resolver: com.zen.notify.filters.CurrentTenantIdentifierResolverImpl
+        multi_tenant_connection_provider: com.zen.notify.filters.MultiTenantConnectionProviderImpl
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: sendtosankar@gmail.com
+    password: apsg dsyc izdh yrht
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8767/eureka
+
+server:
+  port: 8083
+
+logging:
+  level:
+    com.zen.notify: DEBUG
+    com.netflix: ERROR
+  file:
+    name: logs/crm-debug.log
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%X{requestId}] [%X{sessionId}] %-5level %logger{36} - %msg%n"

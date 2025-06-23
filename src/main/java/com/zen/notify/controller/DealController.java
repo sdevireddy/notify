@@ -28,7 +28,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/deals")
+@RequestMapping("/crm/deals")
 public class DealController {
 
     @Autowired

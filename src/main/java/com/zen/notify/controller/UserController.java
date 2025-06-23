@@ -26,7 +26,7 @@ import com.zen.notify.entity.ZenUser;
 import com.zen.notify.service.UserService;
 
 @RestController
-@RequestMapping("/api/users")
+@RequestMapping("/crm/users")
 public class UserController {
 
     @Autowired

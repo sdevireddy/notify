@@ -3,6 +3,7 @@ package com.zen.notify.controller;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.zen.notify.PasswordGenerator;
@@ -20,6 +21,8 @@ import java.util.Optional;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+@RestController
+@RequestMapping("/crm")
 public class InvitaitonController {
 	
 	@Autowired

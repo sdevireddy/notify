@@ -2,6 +2,7 @@ package com.zen.notify.controller;
 
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,9 +21,11 @@ import com.zen.notify.search.LeadSearchCriteria;
 import com.zen.notify.service.LeadConversionService;
 import com.zen.notify.service.LeadService;
 
-@CrossOrigin(origins = "http://localhost:3000")
+import jakarta.persistence.EntityNotFoundException;
+
+//@CrossOrigin(origins = "http://localhost:3000")
 @RestController
-@RequestMapping("/api/leads")
+@RequestMapping("/crm/leads")
 @RequiredArgsConstructor
 public class LeadController {
 
@@ -60,20 +63,31 @@ public class LeadController {
 	    
 	    @GetMapping("/{id}")
 	    public ResponseEntity<?> getLeadById(@PathVariable Long id) {
-	    	try {
-	    		 Lead lead = leadService.getLeadById(id);
-	 	        LeadDTO leadDto = LeadMapper.toDto(lead);
-	 	        return leadDto != null ? ResponseEntity.ok(leadDto) : ResponseEntity.notFound().build();
-	    	}catch(Exception aEx) {
-	    		 return ResponseEntity.status(HttpStatus.SC_CONFLICT).body(Map.of(
-	                     "error", "Duplicate contact",
-	                     "message", aEx.getMessage()
-	                 ));
-	    	}
-	       
+	        System.out.println("Id is getting called");
+
+	        try {
+	            Lead lead = leadService.getLeadById(id);
+
+	            if (lead == null) {
+	                return ResponseEntity.status(HttpStatus.SC_NOT_FOUND)
+	                    .body(Map.of("error", "Lead not found", "message", "No lead exists with id: " + id));
+	            }
+
+	            System.out.println("Lead service called");
+	            LeadDTO leadDto = LeadMapper.toDto(lead);
+	            return ResponseEntity.ok(leadDto);
+
+	        } catch (NoSuchElementException | EntityNotFoundException ex) {
+	            return ResponseEntity.status(HttpStatus.SC_NOT_FOUND)
+	                .body(Map.of("error", "Lead not found", "message", ex.getMessage()));
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	            return ResponseEntity.status(HttpStatus.SC_INTERNAL_SERVER_ERROR)
+	                .body(Map.of("error", "Unexpected error", "message", ex.getMessage()));
+	        }
 	    }
 
-	    @PostMapping
+	    @PostMapping("/create")
 	    public ResponseEntity<?> createLead(@RequestBody LeadDTO leadDto) {
 	    	 try {
 	    		 System.out.println("Controller lead " + leadDto.toString());

@@ -24,12 +24,12 @@ import jakarta.servlet.http.HttpServletResponse;
 
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/crm")
 public class AuthController {
 
-    @Autowired
-    private AuthenticationManager authManager;
-
+	/*
+	 * @Autowired private AuthenticationManager authManager;
+	 */
     @Autowired
     private JwtUtil jwtUtil;
 
@@ -46,9 +46,11 @@ public class AuthController {
         try {
         	System.out.println("username is " + authRequest.getUsername() 
         	+ "password is " + authRequest.getPassword());;
-            authManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(authRequest.getUsername(), authRequest.getPassword())
-            );
+			/*
+			 * authManager.authenticate( new
+			 * UsernamePasswordAuthenticationToken(authRequest.getUsername(),
+			 * authRequest.getPassword()) );
+			 */
         } catch (AuthenticationException e) {
         	e.printStackTrace();
             throw new Exception("Invalid username or password", e);
@@ -76,11 +78,12 @@ public class AuthController {
     
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthRequest request, HttpServletResponse response) {
-        // Step 1: Authenticate
-        Authentication authentication = authManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getUsername(), request.getPassword())
-        );
-
+		/*
+		 * // Step 1: Authenticate Authentication authentication =
+		 * authManager.authenticate( new
+		 * UsernamePasswordAuthenticationToken(request.getUsername(),
+		 * request.getPassword()) );
+		 */
         // Step 2: Load user details and tenant/module/role info
         ZenUserDetails userDetails = (ZenUserDetails) zenUserDetailsService.loadUserByUsername(request.getUsername());
 
