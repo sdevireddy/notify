@@ -3,9 +3,9 @@ spring:
     name: crm-service
 
   datasource:
-    url: jdbc:mysql://localhost:3306/
+    url: jdbc:mysql://shortline.proxy.rlwy.net:25041/railway
     username: root
-    password: password
+    password: JRPJQFaNphMviBYbeJXBfcXgDUQYBYPp
     driver-class-name: com.mysql.cj.jdbc.Driver
     hikari:
       maximum-pool-size: 10
