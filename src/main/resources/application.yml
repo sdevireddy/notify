@@ -7,6 +7,13 @@ spring:
     username: root
     password: password
     driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 2
+      idle-timeout: 300000 # 5 minutes
+      max-lifetime: 1800000 # 30 minutes
+      connection-timeout: 30000 # 30 seconds
+      pool-name: MasterHikariPool
 
   jpa:
     hibernate:
@@ -20,7 +27,6 @@ spring:
         multiTenancy: SCHEMA
         tenant_identifier_resolver: com.zen.notify.filters.CurrentTenantIdentifierResolverImpl
         multi_tenant_connection_provider: com.zen.notify.filters.MultiTenantConnectionProviderImpl
-
 
   mail:
     host: smtp.gmail.com
@@ -47,6 +53,7 @@ server:
 logging:
   level:
     com.zen.notify: DEBUG
+    com.netflix: ERROR
   file:
     name: logs/crm-debug.log
   pattern:
