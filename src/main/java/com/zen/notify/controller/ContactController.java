@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -107,11 +108,25 @@ public class ContactController {
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteContact(@PathVariable Long id) {
         log.info("🗑️ Deleting contact with ID: {}", id);
-        contactService.deleteContact(id);
-        log.info("✅ Contact deleted successfully with ID: {}", id);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of(
-                "message", id + " got deleted"
-        ));
+        try {
+            contactService.deleteContact(id);
+            log.info("✅ Contact deleted successfully with ID: {}", id);
+            return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of(
+                    "message", id + " got deleted"
+            ));
+        } catch (DataIntegrityViolationException ex) {
+            log.error("❌ Cannot delete contact due to active deals or constraints: {}", ex.getMessage());
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(Map.of(
+                    "error", "Cannot delete contact",
+                    "message", "This contact is associated with active deals. Please reassign or remove the deals before deleting."
+            ));
+        } catch (Exception e) {
+            log.error("❌ Unexpected error while deleting contact: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "error", "Unexpected error",
+                    "message", e.getMessage()
+            ));
+        }
     }
 
     @PostMapping("/search")
@@ -136,13 +151,4 @@ public class ContactController {
         log.info("✅ Found {} contacts matching search criteria", contactDTO.getContent().size());
         return ResponseEntity.ok(response);
     }
-
-// Uncomment if needed
-//    @PostMapping("/{contactId}/convertToDeal")
-//    public ResponseEntity<Deal> convertToDeal(@PathVariable Long contactId) {
-//        log.info("🔁 Converting contact to deal with ID: {}", contactId);
-//        Deal deal = converter.convertContactToDeal(contactId);
-//        log.info("✅ Contact converted to deal for contact ID: {}", contactId);
-//        return ResponseEntity.ok(deal);
-//    }
-}
+} 
