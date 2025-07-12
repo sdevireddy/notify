@@ -56,7 +56,7 @@ server:
 
 logging:
   level:
-    com.zen.notify: DEBUG
+    com.zen.notify: ERROR
     com.netflix: ERROR
   file:
     name: logs/crm-debug.log
