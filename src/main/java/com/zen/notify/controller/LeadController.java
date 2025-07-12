@@ -177,17 +177,19 @@ public class LeadController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteLead(@PathVariable Long id, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> deleteLead(@PathVariable Long id, HttpServletRequest request) {
         logger.info("Deleting lead with ID: {}", id);
         leadService.deleteLead(id);
-        return ResponseEntity.status(HttpStatus.SC_NO_CONTENT).body(
-                ApiResponse.<Void>builder()
+
+        return ResponseEntity.ok(
+                ApiResponse.<String>builder()
                         .timestamp(ZonedDateTime.now())
-                        .status(HttpStatus.SC_NO_CONTENT)
-                        .error("Deleted")
+                        .status(HttpStatus.OK.value())
+                        .error(null)
                         .path(request.getRequestURI())
-                        .data(null)
-                        .build());
+                        .data("Lead with ID " + id + " deleted successfully.")
+                        .build()
+        );
     }
 
     @PostMapping("/{leadId}/convert")

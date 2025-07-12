@@ -23,7 +23,7 @@ public class LeadSearchCriteria {
 	    private String secondaryEmail;
 	    private String twitter;
 	    private String description;
-	    private Boolean converted = false;
+	    private Boolean converted;
 	    
 		public String getLeadOwner() {
 			return leadOwner;
