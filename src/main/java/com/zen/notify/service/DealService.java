@@ -1,14 +1,12 @@
 package com.zen.notify.service;
 
-
 import com.zen.notify.entity.Deal;
-import com.zen.notify.entity.Lead;
-import com.zen.notify.mapper.DealMapper;
 import com.zen.notify.repository.DealRepository;
 import com.zen.notify.search.DealSearchCriteria;
 import com.zen.notify.search.DealSpecification;
-import com.zen.notify.search.LeadSearchCriteria;
-import com.zen.notify.search.LeadSpecification;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -24,32 +22,49 @@ import java.util.Optional;
 @Service
 public class DealService {
 
+    private static final Logger log = LoggerFactory.getLogger(DealService.class);
+
     @Autowired
     private DealRepository dealRepository;
 
     // Create Deal
     public Deal createDeal(Deal deal) {
-    	deal.setCreatedAt(new Date());
-    	deal.setUpdatedAt(new Date());
-            return dealRepository.save(deal);
-        }
+        deal.setCreatedAt(new Date());
+        deal.setUpdatedAt(new Date());
+        Deal saved = dealRepository.save(deal);
+        log.info("✅ Deal created: ID={}, Name={}", saved.getDealId(), saved.getDealName());
+        return saved;
+    }
+
     // Get All Deals
     public List<Deal> getAllDeals() {
-        return dealRepository.findAll();
+        List<Deal> deals = dealRepository.findAll();
+        log.info("📦 Retrieved all deals: Count={}", deals.size());
+        return deals;
     }
-    
+
+    // Get Deals Paginated
     public Page<Deal> getDealsPaginated(int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        return dealRepository.findAll(pageable);
+        Page<Deal> result = dealRepository.findAll(pageable);
+        log.info("📄 Paginated deals fetched: Page={}, Size={}, Total={}", page, pageSize, result.getTotalElements());
+        return result;
     }
 
     // Get Deal by ID
     public Optional<Deal> getDealById(Long dealId) {
-        return dealRepository.findById(dealId);
+        Optional<Deal> dealOpt = dealRepository.findById(dealId);
+        if (dealOpt.isPresent()) {
+            log.info("🔍 Deal found: ID={}", dealId);
+        } else {
+            log.warn("⚠️ Deal not found: ID={}", dealId);
+        }
+        return dealOpt;
     }
 
     // Update Deal
     public Deal updateDeal(Long dealId, Deal dealDetails) {
+        log.info("🛠️ Updating deal: ID={}", dealId);
         return dealRepository.findById(dealId).map(deal -> {
             deal.setDealOwner(dealDetails.getDealOwner());
             deal.setDealName(dealDetails.getDealName());
@@ -65,20 +80,31 @@ public class DealService {
             deal.setProbability(dealDetails.getProbability());
             deal.setExpectedRevenue(dealDetails.getExpectedRevenue());
             deal.setCampaignSource(dealDetails.getCampaignSource());
-            return dealRepository.save(deal);
-        }).orElseThrow(() -> new RuntimeException("Deal not found"));
+            deal.setUpdatedAt(new Date());
+
+            Deal updated = dealRepository.save(deal);
+            log.info("✅ Deal updated: ID={}, Name={}", updated.getDealId(), updated.getDealName());
+            return updated;
+        }).orElseThrow(() -> {
+            log.error("❌ Update failed: Deal not found with ID={}", dealId);
+            return new RuntimeException("Deal not found");
+        });
     }
 
     // Delete Deal
     public void deleteDeal(Long dealId) {
+        log.info("🗑️ Attempting to delete deal: ID={}", dealId);
         dealRepository.deleteById(dealId);
+        log.info("✅ Deal deleted: ID={}", dealId);
     }
-    
+
+    // Search Deals
     public Page<Deal> searchDeals(DealSearchCriteria criteria, int page, int size) {
+        log.info("🔎 Searching deals with criteria={}, page={}, size={}", criteria, page, size);
         Pageable pageable = PageRequest.of(page, size);
         Specification<Deal> spec = new DealSpecification(criteria);
-        return dealRepository.findAll(spec, pageable);
+        Page<Deal> result = dealRepository.findAll(spec, pageable);
+        log.info("✅ Deal search returned {} results", result.getTotalElements());
+        return result;
     }
-
 }
-

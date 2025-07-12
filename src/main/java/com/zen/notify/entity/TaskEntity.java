@@ -1,4 +1,4 @@
-package com.zen.notify.controller;
+package com.zen.notify.entity;
 
 
 import jakarta.persistence.*;
@@ -6,7 +6,7 @@ import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "tasks")
-public class TaskController {
+public class TaskEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -57,10 +57,4 @@ public class TaskController {
     public void setRelatedTo(RelatedEntity relatedTo) { this.relatedTo = relatedTo; }
 }
 
-enum AssociatedEntity {
-    ACCOUNT, DEAL, PRODUCT, PURCHASE_ORDER, SALES_ORDER, QUOTE, INVOICE
-}
 
-enum RelatedEntity {
-    ACCOUNT, DEAL, PRODUCT, PURCHASE_ORDER, SALES_ORDER, QUOTE, INVOICE
-}
