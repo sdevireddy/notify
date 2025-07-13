@@ -184,7 +184,7 @@ public class LeadController {
         return ResponseEntity.ok(
                 ApiResponse.<String>builder()
                         .timestamp(ZonedDateTime.now())
-                        .status(HttpStatus.OK.value())
+                        .status(HttpStatus.SC_OK)
                         .error(null)
                         .path(request.getRequestURI())
                         .data("Lead with ID " + id + " deleted successfully.")

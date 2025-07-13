@@ -10,9 +10,9 @@ spring:
     hikari:
       maximum-pool-size: 10
       minimum-idle: 2
-      idle-timeout: 300000 # 5 minutes
-      max-lifetime: 1800000 # 30 minutes
-      connection-timeout: 30000 # 30 seconds
+      idle-timeout: 300000        # 5 minutes
+      max-lifetime: 1800000       # 30 minutes
+      connection-timeout: 30000   # 30 seconds
       pool-name: MasterHikariPool
 
   jpa:
@@ -40,6 +40,10 @@ spring:
           starttls:
             enable: true
 
+server:
+  port: 8083
+  address: 0.0.0.0    # Recommended so it's accessible by private IP
+
 eureka:
   client:
     register-with-eureka: true
@@ -49,10 +53,7 @@ eureka:
   instance:
     hostname: ec2-13-51-106-246.eu-north-1.compute.amazonaws.com
     prefer-ip-address: false
-    instance-id: ec2-13-51-106-246.eu-north-1.compute.amazonaws.com:8083
-
-server:
-  port: 8083
+    instance-id: ec2-13-51-106-246.eu-north-1.compute.amazonaws.com:crm-service:8083
 
 logging:
   level:
