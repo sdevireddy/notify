@@ -70,7 +70,7 @@ public class ContactController {
         }
     }
 
-    @PostMapping
+    @PostMapping("/create")
     public ResponseEntity<?> createContact(@RequestBody ContactDTO contactDto) {
         log.info("📝 Creating new contact: {}", contactDto);
 

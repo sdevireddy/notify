@@ -46,13 +46,14 @@ public class Deal {
     private Date closingDate;
 
     
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "contactID", foreignKey = @ForeignKey(name = "fk_deal_contact"))
     private Contact contact;
-    
-    @ManyToOne
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "accountID", foreignKey = @ForeignKey(name = "fk_deal_account"))
     private Account account;
+
 
 
     @Enumerated(EnumType.STRING)

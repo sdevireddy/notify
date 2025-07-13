@@ -3,7 +3,10 @@ package com.zen.notify.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import com.zen.notify.entity.*;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name = "contacts", indexes = {@Index(name = "idx_email", columnList = "email")})
@@ -26,10 +29,13 @@ public class Contact {
 
     @Column(nullable = false, length = 50)
     private String lastName;
-
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
+    
     @JoinColumn(name = "accountID", foreignKey = @ForeignKey(name = "fk_contact_account"))
     private Account account;
+
+    @OneToMany(mappedBy = "contact", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Deal> deals = new ArrayList<>();
 
     private String vendorName;
 

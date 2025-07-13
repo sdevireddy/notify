@@ -75,6 +75,9 @@ public class Account {
     
     @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     private List<Contact> contacts = new ArrayList<>();
+    
+    @OneToMany(mappedBy = "account", cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
+    private List<Deal> deals = new ArrayList<>();
 
     public enum AccountType {
         CUSTOMER, PARTNER, VENDOR, PROSPECT, OTHER
