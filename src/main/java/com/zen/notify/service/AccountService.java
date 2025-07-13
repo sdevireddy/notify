@@ -1,14 +1,18 @@
 package com.zen.notify.service;
 
 import com.zen.notify.dto.AccountUpdateDTO;
+import com.zen.notify.dto.ApiResponse;
 import com.zen.notify.entity.Account;
 import com.zen.notify.repository.AccountRepository;
 import com.zen.notify.search.AccountSearchCriteria;
 import com.zen.notify.search.AccountSpecification;
 
+import jakarta.persistence.EntityNotFoundException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -126,4 +130,20 @@ public class AccountService {
         log.info("✅ Search results - TotalElements={}", result.getTotalElements());
         return result;
     }
+    
+ // AccountService.java
+    public void deleteAccountById(Long id) {
+        Optional<Account> accountOptional = accountRepository.findById(id);
+
+        if (accountOptional.isEmpty()) {
+            throw new EntityNotFoundException("Account with ID " + id + " not found.");
+        }
+
+        try {
+            accountRepository.deleteById(id);
+        } catch (DataIntegrityViolationException ex) {
+            throw new IllegalStateException("Cannot delete account. It might have linked contacts or dependencies.");
+        }
+    }
+
 }

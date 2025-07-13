@@ -2,23 +2,26 @@ package com.zen.notify.controller;
 
 import com.zen.notify.dto.AccountDTO;
 import com.zen.notify.dto.AccountUpdateDTO;
-import com.zen.notify.dto.PaginatedResponse;
+import com.zen.notify.dto.ApiResponse;
 import com.zen.notify.entity.Account;
 import com.zen.notify.mapper.AccountMapper;
 import com.zen.notify.search.AccountSearchCriteria;
 import com.zen.notify.service.AccountService;
 
+import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.ZonedDateTime;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -31,46 +34,71 @@ public class AccountController {
     @Autowired
     private AccountService accountService;
 
-    // Create Account
     @PostMapping("/create")
-    public ResponseEntity<?> createAccount(@RequestBody AccountDTO accountDto) {
+    public ResponseEntity<ApiResponse<AccountDTO>> createAccount(@RequestBody AccountDTO accountDto, HttpServletRequest request) {
         log.info("📥 Creating account: {}", accountDto);
-
         try {
             Account account = AccountMapper.toEntity(accountDto);
             Account createdAccount = accountService.createAccount(account);
             AccountDTO responseDto = AccountMapper.toDTO(createdAccount);
 
-            log.info("✅ Account created successfully with ID: {}", responseDto.getAccountId());
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseDto);
+            return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.<AccountDTO>builder()
+                    .timestamp(ZonedDateTime.now())
+                    .status(HttpStatus.CREATED.value())
+                    .path(request.getRequestURI())
+                    .data(responseDto)
+                    .build());
+
+        } catch (DataIntegrityViolationException ex) {
+            log.error("❌ Duplicate account error: {}", ex.getMessage(), ex);
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .body(ApiResponse.<AccountDTO>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.CONFLICT.value())
+                            .error("Account name already exists.")
+                            .path(request.getRequestURI())
+                            .build());
         } catch (Exception ex) {
             log.error("❌ Failed to create account: {}", ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Failed to create account: " + ex.getMessage()));
+                    .body(ApiResponse.<AccountDTO>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .error("Failed to create account: " + ex.getMessage())
+                            .path(request.getRequestURI())
+                            .build());
         }
     }
 
-    // Get Account by ID
     @GetMapping("/{id}")
-    public ResponseEntity<AccountDTO> getAccountById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<AccountDTO>> getAccountById(@PathVariable Long id, HttpServletRequest request) {
         log.info("🔍 Fetching account with ID: {}", id);
 
         Optional<Account> accountOpt = accountService.getAccountById(id);
         if (accountOpt.isPresent()) {
             AccountDTO dto = AccountMapper.toDTO(accountOpt.get());
-            log.info("✅ Account found for ID: {}", id);
-            return ResponseEntity.ok(dto);
+            return ResponseEntity.ok(ApiResponse.<AccountDTO>builder()
+                    .timestamp(ZonedDateTime.now())
+                    .status(HttpStatus.OK.value())
+                    .path(request.getRequestURI())
+                    .data(dto)
+                    .build());
         } else {
-            log.warn("⚠️ Account not found with ID: {}", id);
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.<AccountDTO>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .error("Account not found with ID: " + id)
+                            .path(request.getRequestURI())
+                            .build());
         }
     }
 
-    // Get All Accounts (Paginated)
     @GetMapping
-    public ResponseEntity<PaginatedResponse<AccountDTO>> getAllAccounts(
+    public ResponseEntity<ApiResponse<List<AccountDTO>>> getAllAccounts(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "20") int pageSize) {
+            @RequestParam(defaultValue = "20") int pageSize,
+            HttpServletRequest request) {
 
         log.info("📄 Fetching paginated accounts - page: {}, pageSize: {}", page, pageSize);
 
@@ -79,67 +107,120 @@ public class AccountController {
                 .map(AccountMapper::toDTO)
                 .collect(Collectors.toList());
 
-        PaginatedResponse<AccountDTO> response = new PaginatedResponse<>(
-                accountPage.getTotalElements(),
-                accountPage.getSize(),
-                accountPage.getNumber(),
-                accountPage.getTotalPages(),
-                dtoList
-        );
-
-        log.info("✅ Retrieved {} accounts", dtoList.size());
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(ApiResponse.<List<AccountDTO>>builder()
+                .timestamp(ZonedDateTime.now())
+                .status(HttpStatus.OK.value())
+                .path(request.getRequestURI())
+                .totalRecords(accountPage.getTotalElements())
+                .pageSize(accountPage.getSize())
+                .currentPage(accountPage.getNumber())
+                .totalPages(accountPage.getTotalPages())
+                .data(dtoList)
+                .build());
     }
 
-    // Update Account
     @PutMapping("/{id}")
-    public ResponseEntity<AccountDTO> updateAccount(@PathVariable Long id, @RequestBody AccountUpdateDTO dto) {
+    public ResponseEntity<ApiResponse<AccountDTO>> updateAccount(@PathVariable Long id, @RequestBody AccountUpdateDTO dto, HttpServletRequest request) {
         log.info("✏️ Updating account with ID: {}", id);
+        try {
+            Account updated = accountService.updateAccount(id, dto);
+            AccountDTO response = AccountMapper.toDTO(updated);
 
-        Account updated = accountService.updateAccount(id, dto);
-        AccountDTO response = AccountMapper.toDTO(updated);
-
-        log.info("✅ Account updated successfully for ID: {}", id);
-        return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.<AccountDTO>builder()
+                    .timestamp(ZonedDateTime.now())
+                    .status(HttpStatus.OK.value())
+                    .path(request.getRequestURI())
+                    .data(response)
+                    .build());
+        } catch (EntityNotFoundException ex) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.<AccountDTO>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .error(ex.getMessage())
+                            .path(request.getRequestURI())
+                            .build());
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<AccountDTO>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .error("Failed to update account: " + ex.getMessage())
+                            .path(request.getRequestURI())
+                            .build());
+        }
     }
 
-    // Delete Account
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteAccount(@PathVariable Long id) {
-        log.info("🗑️ Deleting account with ID: {}", id);
-
-        accountService.deleteAccount(id);
-
-        log.info("✅ Account deleted successfully for ID: {}", id);
-        return ResponseEntity.ok("Account deleted successfully");
+    public ResponseEntity<ApiResponse<String>> deleteAccount(@PathVariable Long id, HttpServletRequest request) {
+        try {
+            accountService.deleteAccountById(id);
+            return ResponseEntity.ok(ApiResponse.<String>builder()
+                    .timestamp(ZonedDateTime.now())
+                    .status(HttpStatus.OK.value())
+                    .path(request.getRequestURI())
+                    .data("Account deleted successfully")
+                    .build());
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(ApiResponse.<String>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.NOT_FOUND.value())
+                            .error(e.getMessage())
+                            .path(request.getRequestURI())
+                            .build());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(ApiResponse.<String>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.BAD_REQUEST.value())
+                            .error(e.getMessage())
+                            .path(request.getRequestURI())
+                            .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(ApiResponse.<String>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .error("Unexpected error occurred while deleting account.")
+                            .path(request.getRequestURI())
+                            .build());
+        }
     }
 
-    // Search Accounts
     @PostMapping("/search")
-    public ResponseEntity<?> searchLeads(
+    public ResponseEntity<ApiResponse<List<AccountDTO>>> searchAccounts(
             @RequestBody AccountSearchCriteria criteria,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            HttpServletRequest request) {
 
         log.info("🔎 Searching accounts with criteria: {}, page: {}, size: {}", criteria, page, size);
-
         try {
             Page<Account> accountPage = accountService.searchAccounts(criteria, page, size);
+            List<AccountDTO> dtoList = accountPage.getContent().stream()
+                    .map(AccountMapper::toDTO)
+                    .collect(Collectors.toList());
 
-            PaginatedResponse<Account> response = new PaginatedResponse<>(
-                    accountPage.getTotalElements(),
-                    accountPage.getSize(),
-                    accountPage.getNumber(),
-                    accountPage.getTotalPages(),
-                    accountPage.getContent()
-            );
-
-            log.info("✅ Account search returned {} results", response.getData().size());
-            return ResponseEntity.ok(response);
+            return ResponseEntity.ok(ApiResponse.<List<AccountDTO>>builder()
+                    .timestamp(ZonedDateTime.now())
+                    .status(HttpStatus.OK.value())
+                    .path(request.getRequestURI())
+                    .totalRecords(accountPage.getTotalElements())
+                    .pageSize(accountPage.getSize())
+                    .currentPage(accountPage.getNumber())
+                    .totalPages(accountPage.getTotalPages())
+                    .data(dtoList)
+                    .build());
         } catch (Exception ex) {
             log.error("❌ Account search failed: {}", ex.getMessage(), ex);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("error", "Account search failed", "message", ex.getMessage()));
+                    .body(ApiResponse.<List<AccountDTO>>builder()
+                            .timestamp(ZonedDateTime.now())
+                            .status(HttpStatus.INTERNAL_SERVER_ERROR.value())
+                            .error("Account search failed: " + ex.getMessage())
+                            .path(request.getRequestURI())
+                            .build());
         }
     }
 }
